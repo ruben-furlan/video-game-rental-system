@@ -9,4 +9,5 @@ public class GameInventoryModel {
     private String title;
     private String type;
     private Integer stock;
+    private GameInventoryPriceModel inventoryPriceModel;
 }

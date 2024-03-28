@@ -6,8 +6,8 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class GameInventoryCostConfigurationModel {
+public class GameInventoryPriceModel {
     private String type;
-    private BigDecimal cost;
+    private BigDecimal amount;
     private String currency;
 }
