@@ -11,3 +11,4 @@ public class GameInventoryModel {
     private Integer stock;
     private GameInventoryPriceModel inventoryPriceModel;
 }
+
