@@ -1,6 +1,5 @@
 package com.videogamerentalsystem.infraestucture.adapter.out.entity.inventory;
 
-import com.videogamerentalsystem.infraestucture.adapter.out.entity.rental.CustomerEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

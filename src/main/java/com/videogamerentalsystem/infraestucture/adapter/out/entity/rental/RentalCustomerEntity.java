@@ -20,8 +20,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 @Entity
-@Table(name = "CUSTOMER")
-public class CustomerEntity {
+@Table(name = "RENTAL_CUSTOMER")
+public class RentalCustomerEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +38,7 @@ public class CustomerEntity {
     private String latName;
 
     @Column(name = "LOYALTY_POINTS")
-    private String loyaltyPoints;
+    private Integer loyaltyPoints;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
     public Set<RentalEntity> rentals;
