@@ -36,7 +36,7 @@ public class GameInventoryPriceEntity {
     private String type;
 
     @Column(name = "AMOUNT")
-    private String amount;
+    private BigDecimal amount;
 
     @Column(name = "CURRENCY")
     private String currency;
