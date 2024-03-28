@@ -47,7 +47,7 @@ public class RentalEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "CUSTOMER_ID")
-    private CustomerEntity customer;
+    private RentalCustomerEntity customer;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "rental", cascade = CascadeType.ALL)
     public Set<RentalProductEntity> rentalProducts;
