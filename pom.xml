@@ -11,7 +11,7 @@
 	<groupId>com</groupId>
 	<artifactId>video-game-rental-system</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>videogame-rental-system</name>
+	<name>video-game-rental-system</name>
 	<description>Video game rental system</description>
 
 	<properties>
