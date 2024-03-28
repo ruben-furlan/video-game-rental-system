@@ -1,12 +1,13 @@
 package com.videogamerentalsystem.domain.model.inventory;
 
+import java.math.BigDecimal;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
-public class GameInventoryModel {
-    private String title;
+public class GameInventoryCostConfigurationModel {
     private String type;
-    private Integer stock;
+    private BigDecimal cost;
+    private String currency;
 }
