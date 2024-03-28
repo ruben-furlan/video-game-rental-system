@@ -32,7 +32,7 @@ public class PersistenceConfig {
         return dataSourceBuilder.build();
     }
 
-    @Bean
+ /*   @Bean
     public DataSourceInitializer dataSourceInitializer(DataSource dataSource) {
         DataSourceInitializer initializer = new DataSourceInitializer();
         initializer.setDataSource(dataSource);
@@ -45,5 +45,5 @@ public class PersistenceConfig {
         populator.addScript(new ClassPathResource(DB_INIT_STRUCTURE));
         populator.addScript(new ClassPathResource(DB_DATA));
         return populator;
-    }
+    }*/
 }

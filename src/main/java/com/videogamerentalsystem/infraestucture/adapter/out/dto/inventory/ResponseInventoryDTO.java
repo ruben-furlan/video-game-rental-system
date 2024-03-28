@@ -1,15 +1,14 @@
-package com.videogamerentalsystem.domain.model.inventory;
+package com.videogamerentalsystem.infraestucture.adapter.out.dto.inventory;
 
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
-public class GameInventoryModel {
+public class ResponseInventoryDTO {
     private Long id;
     private String title;
     private String type;
     private Integer stock;
-    private GameInventoryPriceModel inventoryPriceModel;
+    private ResponseInventoryPriceDTO price;
 }
-
