@@ -3,7 +3,7 @@ package com.videogamerentalsystem.infraestucture.adapter.out.persistence.invento
 
 import com.videogamerentalsystem.common.PersistenceAdapter;
 import com.videogamerentalsystem.domain.model.inventory.GameInventoryModel;
-import com.videogamerentalsystem.domain.port.out.inventory.GameInventoryPort;
+import com.videogamerentalsystem.domain.port.out.inventory.GameInventoryRepositoryPort;
 import com.videogamerentalsystem.infraestucture.adapter.out.entity.inventory.GameInventoryEntity;
 import com.videogamerentalsystem.infraestucture.adapter.out.mapper.inventory.GameInventoryMapper;
 import com.videogamerentalsystem.infraestucture.adapter.out.repository.SpringDataJpaGameInventory;
@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 @PersistenceAdapter
 @RequiredArgsConstructor
-public class GameInventoryPersistenceAdapter implements GameInventoryPort {
+public class GameInventoryPersistenceAdapter implements GameInventoryRepositoryPort {
     private final SpringDataJpaGameInventory springDataJpaGameInventory;
     private final GameInventoryMapper gameInventoryMapper;
 

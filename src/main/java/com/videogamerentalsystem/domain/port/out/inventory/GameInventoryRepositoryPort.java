@@ -1,10 +1,9 @@
 package com.videogamerentalsystem.domain.port.out.inventory;
 
 import com.videogamerentalsystem.domain.model.inventory.GameInventoryModel;
-import java.util.List;
 import java.util.Optional;
 
-public interface GameInventoryPort {
+public interface GameInventoryRepositoryPort {
 
     public GameInventoryModel save(GameInventoryModel gameInventoryModell);
 

@@ -11,26 +11,29 @@ import org.springframework.stereotype.Component;
 @Component
 public class GameInventoryMapper {
 
-
     public GameInventoryEntity toEntityGameInventory(GameInventoryModel gameInventoryModel) {
-        return GameInventoryEntity.builder()
-                .title(gameInventoryModel.getTitle())
-                .type(gameInventoryModel.getType())
-                .stock(gameInventoryModel.getStock())
-                .inventoryPriceEntity(this.toEntityGameInventoryPrice(gameInventoryModel.getInventoryPriceModel()))
-                .build();
-    }
+            GameInventoryPriceEntity priceEntity = this.toEntityGameInventoryPrice(gameInventoryModel.getInventoryPriceModel());
+            GameInventoryEntity inventoryEntity = GameInventoryEntity.builder()
+                    .title(gameInventoryModel.getTitle())
+                    .type(gameInventoryModel.getType())
+                    .stock(gameInventoryModel.getStock())
+                    .inventoryPriceEntity(priceEntity)
+                    .build();
+            priceEntity.setGameInventoryEntity(inventoryEntity);
+            return inventoryEntity;
+        }
 
-    private GameInventoryPriceEntity toEntityGameInventoryPrice(GameInventoryPriceModel gameInventoryPriceModel) {
-        return GameInventoryPriceEntity.builder()
-                .type(gameInventoryPriceModel.getType())
-                .amount(gameInventoryPriceModel.getAmount())
-                .currency(gameInventoryPriceModel.getCurrency())
-                .build();
-    }
+        private GameInventoryPriceEntity toEntityGameInventoryPrice(GameInventoryPriceModel gameInventoryPriceModel) {
+            return GameInventoryPriceEntity.builder()
+                    .type(gameInventoryPriceModel.getType())
+                    .amount(gameInventoryPriceModel.getAmount())
+                    .currency(gameInventoryPriceModel.getCurrency())
+                    .build();
+        }
 
     public GameInventoryModel toModelGameInventory(GameInventoryEntity gameInventoryEntity) {
         return GameInventoryModel.builder()
+                .id(gameInventoryEntity.getId())
                 .title(gameInventoryEntity.getTitle())
                 .type(gameInventoryEntity.getType())
                 .stock(gameInventoryEntity.getStock())
