@@ -21,8 +21,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 @Entity
-@Table(name = "GAME_INVENTORY_COST_CONFIGURATION")
-public class GameInventoryCostConfigurationEntity {
+@Table(name = "GAME_INVENTORY_PRICE")
+public class GameInventoryPriceEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,8 +35,8 @@ public class GameInventoryCostConfigurationEntity {
     @Column(name = "TYPE")
     private String type;
 
-    @Column(name = "COST")
-    private BigDecimal cost;
+    @Column(name = "AMOUNT")
+    private String amount;
 
     @Column(name = "CURRENCY")
     private String currency;

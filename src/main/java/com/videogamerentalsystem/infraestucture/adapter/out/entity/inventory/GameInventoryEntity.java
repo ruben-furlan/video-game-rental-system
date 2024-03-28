@@ -42,7 +42,7 @@ public class GameInventoryEntity {
     private Integer stock;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "GAME_INVENTORY_COST_CONFIGURATION_ID")
-    private GameInventoryCostConfigurationEntity gameInventoryCostConfiguration;
+    @JoinColumn(name = "GAME_INVENTORY_PRICE_ID")
+    private GameInventoryPriceEntity inventoryPriceEntity;
 
 }

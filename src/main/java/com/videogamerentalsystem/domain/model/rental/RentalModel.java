@@ -8,11 +8,9 @@ import lombok.Getter;
 @Getter
 @Builder
 public class RentalModel {
-
     private LocalDateTime date;
     private String currency;
     private String paymentType;
     private RentalCustomerModel customerModel;
     private Set<RentalProductModel> productModels;
-
 }
