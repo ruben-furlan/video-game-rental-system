@@ -11,7 +11,7 @@ public class ResponseProductDTO {
     private Long id;
     private String title;
     private String type;
-    private Integer numberDate;
+    private Integer numberDays;
     private LocalDateTime endDate;
     private ResponseProductChargeDTO charges;
 }

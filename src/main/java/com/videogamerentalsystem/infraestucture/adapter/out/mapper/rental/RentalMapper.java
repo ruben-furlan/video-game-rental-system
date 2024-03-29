@@ -7,6 +7,7 @@ import com.videogamerentalsystem.domain.model.rental.RentalProductModel;
 import com.videogamerentalsystem.infraestucture.adapter.out.entity.rental.RentalCustomerEntity;
 import com.videogamerentalsystem.infraestucture.adapter.out.entity.rental.RentalEntity;
 import com.videogamerentalsystem.infraestucture.adapter.out.entity.rental.RentalProductEntity;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
@@ -53,12 +54,17 @@ public class RentalMapper {
     }
 
     private RentalProductEntity toRentalProductEntity(RentalProductModel rentalProductModel) {
-        return RentalProductEntity.builder()
-                .title(rentalProductModel.getTitle())
+        RentalProductEntity.RentalProductEntityBuilder builder = RentalProductEntity.builder();
+        builder.title(rentalProductModel.getTitle())
                 .type(rentalProductModel.getType())
-                .endDate(rentalProductModel.getEndDate())
-                .price(rentalProductModel.getCharges().getPrice())
-                .build();
+                .endDate(rentalProductModel.getEndDate());
+
+        RentalProductChargeModel charges = rentalProductModel.getCharges();
+        if(Objects.nonNull(charges)){
+            builder.price(charges.getPrice());
+        }
+
+        return builder.build();
     }
 
     public RentalModel toRentalModel(RentalEntity rentalEntity) {

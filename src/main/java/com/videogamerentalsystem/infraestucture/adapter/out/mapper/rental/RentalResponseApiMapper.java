@@ -10,6 +10,7 @@ import com.videogamerentalsystem.infraestucture.adapter.out.dto.rental.ResponseP
 import com.videogamerentalsystem.infraestucture.adapter.out.dto.rental.ResponseProductSurchargesDTO;
 import com.videogamerentalsystem.infraestucture.adapter.out.dto.rental.ResponseRentalCustomerDTO;
 import com.videogamerentalsystem.infraestucture.adapter.out.dto.rental.ResponseRentalDTO;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,6 @@ public class RentalResponseApiMapper {
         return ResponseRentalDTO.builder()
                 .id(rentalModel.getId())
                 .date(rentalModel.getDate())
-                .numberDate(rentalModel.getNumberDate())
                 .currency(rentalModel.getCurrency())
                 .paymentType(rentalModel.getPaymentType())
                 .customer(this.toResponseRentalCustomerApi(rentalModel.getCustomerModel()))
@@ -46,6 +46,7 @@ public class RentalResponseApiMapper {
                 .id(rentalProductModel.getId())
                 .title(rentalProductModel.getTitle())
                 .type(rentalProductModel.getType())
+                .numberDays(rentalProductModel.getNumberDays())
                 .endDate(rentalProductModel.getEndDate())
                 .charges(this.toResponseProductChargeApi(rentalProductModel.getCharges()))
                 .build();
@@ -60,7 +61,7 @@ public class RentalResponseApiMapper {
     }
 
     private ResponseProductSurchargesDTO toResponseProductSurchargeApi(RentalProductSurchargeModel surchargesModel) {
-        return ResponseProductSurchargesDTO.builder()
+        return Objects.isNull(surchargesModel)?null:ResponseProductSurchargesDTO.builder()
                 .amount(surchargesModel.getAmount())
                 .reason(surchargesModel.getReason())
                 .build();
