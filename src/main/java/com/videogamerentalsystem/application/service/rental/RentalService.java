@@ -1,6 +1,8 @@
 package com.videogamerentalsystem.application.service.rental;
 
+import com.videogamerentalsystem.application.service.inventory.GameInventoryService;
 import com.videogamerentalsystem.common.UseCase;
+import com.videogamerentalsystem.domain.model.inventory.GameInventoryModel;
 import com.videogamerentalsystem.domain.model.rental.RentalCustomerModel;
 import com.videogamerentalsystem.domain.model.rental.RentalModel;
 import com.videogamerentalsystem.domain.model.rental.RentalProductModel;
@@ -8,7 +10,6 @@ import com.videogamerentalsystem.domain.port.in.rental.RentalUserCase;
 import com.videogamerentalsystem.domain.port.in.rental.command.RentalCommand;
 import com.videogamerentalsystem.domain.port.in.rental.command.RentalCustomerCommand;
 import com.videogamerentalsystem.domain.port.in.rental.command.RentalProductCommand;
-import com.videogamerentalsystem.domain.port.out.inventory.GameInventoryRepositoryPort;
 import com.videogamerentalsystem.domain.port.out.rental.RentalRepositoryPort;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 
 @UseCase
@@ -24,19 +26,31 @@ import org.springframework.transaction.annotation.Transactional;
 public class RentalService implements RentalUserCase {
 
     private final RentalRepositoryPort rentalRepositoryPort;
-    private final GameInventoryRepositoryPort gameInventoryRepositoryPort;
+
+    private final GameInventoryService gameInventoryService;
+
     private final RentalPaymentCalculationService rentalPaymentCalculationService;
 
     @Override
     public RentalModel create(RentalCommand rentalCommand) {
         RentalModel buildToModel = this.buildToModel(rentalCommand);
 
-        RentalModel rentalModel = this.rentalRepositoryPort.create(buildToModel);
+        Set<RentalProductModel> productModels = buildToModel.getProductModels();
 
-        this.rentalPaymentCalculationService.calculateAndSetRentalCost(rentalModel);
+        Set<GameInventoryModel> gameInventoryModels = this.gameInventoryService.stockExists(productModels);
 
+        if (CollectionUtils.isEmpty(gameInventoryModels)) {
+            throw new RuntimeException("No hay suficiente stock disponible para crear la renta");
+        } else {
 
-        return  rentalModel;
+            this.rentalPaymentCalculationService.calculateAndSetRentalCost(buildToModel, gameInventoryModels);
+
+            RentalModel rentalModel = this.rentalRepositoryPort.create(buildToModel);
+
+            this.gameInventoryService.stockRemove(gameInventoryModels);
+
+            return rentalModel;
+        }
     }
 
     @Override
@@ -45,7 +59,7 @@ public class RentalService implements RentalUserCase {
     }
 
 
-    private RentalModel buildToModel(RentalCommand rentalCommand){
+    private RentalModel buildToModel(RentalCommand rentalCommand) {
         RentalCustomerCommand rentalCustomerCommand = rentalCommand.customer();
 
         Set<RentalProductCommand> rentalProductCommands = rentalCommand.products();
@@ -62,14 +76,13 @@ public class RentalService implements RentalUserCase {
                 .latName(rentalCustomerCommand.lastName())
                 .build();
 
-      return RentalModel.builder().date(LocalDateTime.now())
+        return RentalModel.builder().date(LocalDateTime.now())
                 .currency(rentalCommand.currency())
                 .paymentType(rentalCommand.paymentType())
                 .customerModel(customerModel)
                 .productModels(productModels)
                 .build();
     }
-
 
 
 }

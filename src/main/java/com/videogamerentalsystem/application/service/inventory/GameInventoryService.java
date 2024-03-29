@@ -3,11 +3,16 @@ package com.videogamerentalsystem.application.service.inventory;
 import com.videogamerentalsystem.common.UseCase;
 import com.videogamerentalsystem.domain.model.inventory.GameInventoryModel;
 import com.videogamerentalsystem.domain.model.inventory.GameInventoryPriceModel;
+import com.videogamerentalsystem.domain.model.rental.RentalProductModel;
 import com.videogamerentalsystem.domain.port.in.inventory.GameInventoryUserCase;
 import com.videogamerentalsystem.domain.port.in.inventory.commad.GameInventoryCommand;
 import com.videogamerentalsystem.domain.port.in.inventory.commad.GameInventoryPriceCommand;
 import com.videogamerentalsystem.domain.port.out.inventory.GameInventoryRepositoryPort;
+import java.util.Collections;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +35,32 @@ public class GameInventoryService implements GameInventoryUserCase {
         return this.gameInventoryRepositoryPort.findByID(id);
     }
 
+    @Override
+    public Optional<GameInventoryModel> findInventoryByTitle(String title) {
+        return this.gameInventoryRepositoryPort.findByTitle(title);
+    }
+
+    public Set<GameInventoryModel> stockExists(Set<RentalProductModel> productModels) {
+        Set<GameInventoryModel> gameInventoryModels = this.findGameInventoryModelsByTitles(productModels);
+        if (this.allMatchStock(gameInventoryModels)) {
+            return gameInventoryModels;
+        } else {
+            return this.isNoStockForAnyProductEmptyList();
+        }
+    }
+
+
+    @Override
+    public void stockRemove(Set<GameInventoryModel> gameInventoryModels) {
+
+    }
+
+    @Override
+    public void stackAdd(Set<GameInventoryModel> gameInventoryModels) {
+
+    }
+
+
     private GameInventoryModel  buildToModel(GameInventoryCommand gameInventoryCommand) {
 
         GameInventoryPriceCommand gameInventoryPriceCommand = gameInventoryCommand.price();
@@ -46,4 +77,21 @@ public class GameInventoryService implements GameInventoryUserCase {
                 .stock(gameInventoryCommand.stock())
                 .inventoryPriceModel(gameInventoryPriceModel).build();
     }
+
+
+    private  Set<GameInventoryModel> isNoStockForAnyProductEmptyList() {
+        return Collections.emptySet();
+    }
+
+    private  boolean allMatchStock(Set<GameInventoryModel> gameInventoryModels) {
+        return !gameInventoryModels.isEmpty() && gameInventoryModels.stream().allMatch(game -> Objects.nonNull(game) && game.getStock() > 0);
+    }
+
+    private Set<GameInventoryModel> findGameInventoryModelsByTitles(Set<RentalProductModel> productModels) {
+        return productModels.stream()
+                .map(productModel -> this.gameInventoryRepositoryPort.findByTitle(productModel.getTitle()).orElse(null))
+                .collect(Collectors.toSet());
+    }
+
+
 }
