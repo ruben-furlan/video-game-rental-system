@@ -11,10 +11,12 @@ import com.videogamerentalsystem.domain.port.in.rental.command.RentalCommand;
 import com.videogamerentalsystem.domain.port.in.rental.command.RentalCustomerCommand;
 import com.videogamerentalsystem.domain.port.in.rental.command.RentalProductCommand;
 import com.videogamerentalsystem.domain.port.out.rental.RentalRepositoryPort;
+import com.videogamerentalsystem.infraestucture.exception.custom.ApiException;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -40,18 +42,18 @@ public class RentalService implements RentalUserCase {
         Set<GameInventoryModel> gameInventoryModels = this.gameInventoryService.stockExists(productModels);
 
         if (CollectionUtils.isEmpty(gameInventoryModels)) {
-            throw new RuntimeException("No hay suficiente stock disponible para crear la renta");
-        } else {
-
-            this.rentalPaymentCalculationService.calculateAndSetRentalCost(buildToModel, gameInventoryModels);
-
-            RentalModel rentalModel = this.rentalRepositoryPort.create(buildToModel);
-
-            this.gameInventoryService.stockRemove(gameInventoryModels);
-
-            return rentalModel;
+            throw new ApiException("There is not enough stock available to create the rental. Please, review the inventory.", HttpStatus.BAD_REQUEST);
         }
+
+        this.rentalPaymentCalculationService.calculateAndSetRentalCost(buildToModel, gameInventoryModels);
+
+        RentalModel rentalModel = this.rentalRepositoryPort.create(buildToModel);
+
+        this.gameInventoryService.stockRemove(gameInventoryModels);
+
+        return rentalModel;
     }
+
 
     @Override
     public RentalProductModel findGameByTitleAndRentalId(String title, Long rentalId) {
