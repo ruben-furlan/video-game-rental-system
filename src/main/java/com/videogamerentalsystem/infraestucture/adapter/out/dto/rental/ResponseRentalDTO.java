@@ -1,4 +1,4 @@
-package com.videogamerentalsystem.domain.model.rental;
+package com.videogamerentalsystem.infraestucture.adapter.out.dto.rental;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -7,11 +7,11 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class RentalModel {
+public class ResponseRentalDTO {
     private Long id;
     private LocalDateTime date;
     private String currency;
     private String paymentType;
-    private RentalCustomerModel customerModel;
-    private Set<RentalProductModel> productModels;
+    private ResponseRentalCustomerDTO customer;
+    private Set<ResponseProductDTO> products;;
 }

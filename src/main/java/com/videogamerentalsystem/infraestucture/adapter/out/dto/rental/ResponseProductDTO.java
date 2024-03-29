@@ -1,4 +1,4 @@
-package com.videogamerentalsystem.domain.model.rental;
+package com.videogamerentalsystem.infraestucture.adapter.out.dto.rental;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -7,10 +7,11 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class RentalProductModel {
+public class ResponseProductDTO {
     private Long id;
     private String title;
     private String type;
+    private Integer numberDate;
     private LocalDateTime endDate;
-    private BigDecimal price;
+    private ResponseProductChargeDTO charges;
 }
