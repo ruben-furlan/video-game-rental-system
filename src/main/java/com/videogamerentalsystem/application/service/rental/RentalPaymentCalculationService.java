@@ -7,7 +7,7 @@ import com.videogamerentalsystem.domain.model.inventory.constant.GameType;
 import com.videogamerentalsystem.domain.model.rental.RentalModel;
 import com.videogamerentalsystem.domain.model.rental.RentalProductChargeModel;
 import com.videogamerentalsystem.domain.model.rental.RentalProductModel;
-import com.videogamerentalsystem.domain.port.in.rental.RentalPaymentCalculationCase;
+import com.videogamerentalsystem.domain.port.in.rental.RentalPaymentCalculationUserCase;
 import com.videogamerentalsystem.infraestucture.exception.custom.ApiException;
 import com.videogamerentalsystem.infraestucture.exception.custom.ApiExceptionConstantsMessagesError;
 import java.math.BigDecimal;
@@ -24,7 +24,7 @@ import org.springframework.util.CollectionUtils;
 @UseCase
 @RequiredArgsConstructor
 @Transactional(propagation = Propagation.REQUIRED)
-public class RentalPaymentCalculationService implements RentalPaymentCalculationCase {
+public class RentalPaymentCalculationService implements RentalPaymentCalculationUserCase {
 
     @Override
     public void calculateAndSetRentalCost(RentalModel rentalModel, Set<GameInventoryModel> gameInventoryModels) {

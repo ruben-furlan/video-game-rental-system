@@ -8,5 +8,10 @@ import lombok.Getter;
 public class RentalCustomerModel {
     private String firstName;
     private String latName;
+    private String documentNumber;
     private Integer loyaltyPoints;
+
+    public void addLoyaltyPoints( Integer loyaltyPoints){
+        this.loyaltyPoints=loyaltyPoints;
+    }
 }
