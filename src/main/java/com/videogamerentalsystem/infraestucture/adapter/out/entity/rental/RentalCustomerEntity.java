@@ -6,19 +6,21 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 @Entity
 @Table(name = "RENTAL_CUSTOMER")
 public class RentalCustomerEntity {
@@ -40,7 +42,8 @@ public class RentalCustomerEntity {
     @Column(name = "LOYALTY_POINTS")
     private Integer loyaltyPoints;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
-    public Set<RentalEntity> rentals;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "RENTAL_ID")
+    public RentalEntity rental;
 
 }
