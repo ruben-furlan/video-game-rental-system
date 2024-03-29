@@ -22,7 +22,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
 @Entity
 @Table(name = "RENTAL_PRODUCT")
 public class RentalProductEntity {
@@ -51,4 +50,7 @@ public class RentalProductEntity {
     @JoinColumn(name = "RENTAL_ID")
     private RentalEntity rental;
 
+    public void addJoin(RentalEntity rentalEntity) {
+        this.rental = rentalEntity;
+    }
 }
