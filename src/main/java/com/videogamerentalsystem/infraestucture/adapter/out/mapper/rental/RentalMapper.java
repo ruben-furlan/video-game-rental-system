@@ -36,7 +36,8 @@ public class RentalMapper {
         return RentalCustomerEntity.builder()
                 .firstName(customerModel.getFirstName())
                 .latName(customerModel.getLatName())
-                .loyaltyPoints(1)
+                .documentNumber(customerModel.getDocumentNumber())
+                .loyaltyPoints(customerModel.getLoyaltyPoints())
                 .build();
     }
 

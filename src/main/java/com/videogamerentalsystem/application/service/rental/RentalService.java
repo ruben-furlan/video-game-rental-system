@@ -35,6 +35,8 @@ public class RentalService implements RentalUserCase {
 
     private final RentalPaymentCalculationService rentalPaymentCalculationService;
 
+    private final RentalLoyaltyService rentalLoyaltyService;
+
     @Override
     public RentalModel create(RentalCommand rentalCommand) {
 
@@ -46,7 +48,12 @@ public class RentalService implements RentalUserCase {
 
         this.rentalPaymentCalculationService.calculateAndSetRentalCost(buildToModel, gameInventoryModels);
 
+        Integer loyaltyPoints = this.rentalLoyaltyService.calculateTotalPoints(productModels);
+
+        buildToModel.getCustomerModel().addLoyaltyPoints(loyaltyPoints);
+
         RentalModel rentalModel = this.rentalRepositoryPort.create(buildToModel);
+
 
         this.gameInventoryService.stockRemove(gameInventoryModels);
 
@@ -76,6 +83,7 @@ public class RentalService implements RentalUserCase {
         RentalCustomerModel customerModel = RentalCustomerModel.builder()
                 .firstName(rentalCustomerCommand.firstName())
                 .latName(rentalCustomerCommand.lastName())
+                .documentNumber(rentalCustomerCommand.DocumentNumber())
                 .build();
 
         return RentalModel.builder().date(LocalDateTime.now())

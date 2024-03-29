@@ -8,5 +8,6 @@ import lombok.Getter;
 public class ResponseRentalCustomerDTO {
     private String firstName;
     private String latName;
-    private Integer loyaltyPoints;
+    private String documentNumber;
+    private Integer totalLoyaltyPointsGenerated;
 }
