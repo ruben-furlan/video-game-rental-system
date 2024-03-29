@@ -8,12 +8,18 @@ import com.videogamerentalsystem.domain.port.in.inventory.GameInventoryUserCase;
 import com.videogamerentalsystem.domain.port.in.inventory.commad.GameInventoryCommand;
 import com.videogamerentalsystem.domain.port.in.inventory.commad.GameInventoryPriceCommand;
 import com.videogamerentalsystem.domain.port.out.inventory.GameInventoryRepositoryPort;
-import java.util.Collections;
+import com.videogamerentalsystem.infraestucture.adapter.out.entity.inventory.GameInventoryEntity;
+import com.videogamerentalsystem.infraestucture.exception.custom.ApiException;
+import com.videogamerentalsystem.infraestucture.exception.custom.ApiExceptionConstantsMessagesError;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +32,7 @@ public class GameInventoryService implements GameInventoryUserCase {
 
     @Override
     public GameInventoryModel create(GameInventoryCommand gameInventoryCommand) {
-        GameInventoryModel gameInventoryModel = this.buildToModel(gameInventoryCommand);
+        GameInventoryModel gameInventoryModel = this.buildToModelAndValidate(gameInventoryCommand);
         return this.gameInventoryRepositoryPort.save(gameInventoryModel);
     }
 
@@ -44,15 +50,19 @@ public class GameInventoryService implements GameInventoryUserCase {
         Set<GameInventoryModel> gameInventoryModels = this.findGameInventoryModelsByTitles(productModels);
         if (this.allMatchStock(gameInventoryModels)) {
             return gameInventoryModels;
-        } else {
-            return this.isNoStockForAnyProductEmptyList();
         }
+        throw new ApiException("There is not enough stock available to create the rental. Please, review the inventory.", HttpStatus.BAD_REQUEST);
+
     }
+
 
 
     @Override
     public void stockRemove(Set<GameInventoryModel> gameInventoryModels) {
-
+        gameInventoryModels.forEach(gameInventoryModelCurrent -> {
+            Integer newStock = gameInventoryModelCurrent.getStock() - 1;
+            this.gameInventoryRepositoryPort.updateStock(gameInventoryModelCurrent.getId(), newStock);
+        });
     }
 
     @Override
@@ -60,12 +70,17 @@ public class GameInventoryService implements GameInventoryUserCase {
 
     }
 
-
-    private GameInventoryModel  buildToModel(GameInventoryCommand gameInventoryCommand) {
+    private GameInventoryModel buildToModelAndValidate(GameInventoryCommand gameInventoryCommand) {
+        String title = gameInventoryCommand.title();
+        this.gameInventoryRepositoryPort.findByTitle(title)
+                .ifPresent(game -> {
+                    String errorMessage = "The title '%s' is already present. Please check the inventory, as it may not have enough stock.".formatted(title);
+                    throw new ApiException(errorMessage, HttpStatus.BAD_REQUEST);
+                });
 
         GameInventoryPriceCommand gameInventoryPriceCommand = gameInventoryCommand.price();
 
-        GameInventoryPriceModel gameInventoryPriceModel= GameInventoryPriceModel.builder()
+        GameInventoryPriceModel gameInventoryPriceModel = GameInventoryPriceModel.builder()
                 .type(gameInventoryPriceCommand.type())
                 .currency(gameInventoryPriceCommand.currency())
                 .amount(gameInventoryPriceCommand.amount())
@@ -78,12 +93,7 @@ public class GameInventoryService implements GameInventoryUserCase {
                 .inventoryPriceModel(gameInventoryPriceModel).build();
     }
 
-
-    private  Set<GameInventoryModel> isNoStockForAnyProductEmptyList() {
-        return Collections.emptySet();
-    }
-
-    private  boolean allMatchStock(Set<GameInventoryModel> gameInventoryModels) {
+    private boolean allMatchStock(Set<GameInventoryModel> gameInventoryModels) {
         return !gameInventoryModels.isEmpty() && gameInventoryModels.stream().allMatch(game -> Objects.nonNull(game) && game.getStock() > 0);
     }
 

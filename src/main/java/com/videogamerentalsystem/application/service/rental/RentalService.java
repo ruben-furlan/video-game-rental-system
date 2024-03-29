@@ -13,6 +13,8 @@ import com.videogamerentalsystem.domain.port.in.rental.command.RentalProductComm
 import com.videogamerentalsystem.domain.port.out.rental.RentalRepositoryPort;
 import com.videogamerentalsystem.infraestucture.exception.custom.ApiException;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -35,15 +37,12 @@ public class RentalService implements RentalUserCase {
 
     @Override
     public RentalModel create(RentalCommand rentalCommand) {
-        RentalModel buildToModel = this.buildToModel(rentalCommand);
+
+        RentalModel buildToModel = this.buildToModelAndValidate(rentalCommand);
 
         Set<RentalProductModel> productModels = buildToModel.getProductModels();
 
         Set<GameInventoryModel> gameInventoryModels = this.gameInventoryService.stockExists(productModels);
-
-        if (CollectionUtils.isEmpty(gameInventoryModels)) {
-            throw new ApiException("There is not enough stock available to create the rental. Please, review the inventory.", HttpStatus.BAD_REQUEST);
-        }
 
         this.rentalPaymentCalculationService.calculateAndSetRentalCost(buildToModel, gameInventoryModels);
 
@@ -61,7 +60,8 @@ public class RentalService implements RentalUserCase {
     }
 
 
-    private RentalModel buildToModel(RentalCommand rentalCommand) {
+    private RentalModel buildToModelAndValidate(RentalCommand rentalCommand) {
+        this.validateCommand(rentalCommand);
         RentalCustomerCommand rentalCustomerCommand = rentalCommand.customer();
 
         Set<RentalProductCommand> rentalProductCommands = rentalCommand.products();
@@ -84,6 +84,19 @@ public class RentalService implements RentalUserCase {
                 .customerModel(customerModel)
                 .productModels(productModels)
                 .build();
+    }
+
+    private  void validateCommand(RentalCommand rentalCommand) {
+        Map<String, Long> titleCounts = rentalCommand.products().stream()
+                .collect(Collectors.groupingBy(RentalProductCommand::title, Collectors.counting()));
+        List<String> duplicateTitles = titleCounts.entrySet().stream()
+                .filter(entry -> entry.getValue() > 1)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        if (!duplicateTitles.isEmpty()) {
+            String errorMessage = "Títulos duplicados encontrados: %s".formatted(duplicateTitles);
+            throw new ApiException(errorMessage, HttpStatus.BAD_REQUEST);
+        }
     }
 
 

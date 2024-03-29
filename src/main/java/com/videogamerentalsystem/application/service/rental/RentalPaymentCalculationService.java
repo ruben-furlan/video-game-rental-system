@@ -37,6 +37,7 @@ public class RentalPaymentCalculationService implements RentalPaymentCalculation
     private void applyCostConditions (RentalModel rentalModel, Set<GameInventoryModel> gameInventoryModels, RentalProductModel productModel) {
         GameInventoryModel gameInventoryModel = this.findGameInventoryModel(gameInventoryModels, productModel);
 
+        productModel.setType(gameInventoryModel.getType());
         Integer numberDays = this.calculateNumberDays(productModel, rentalModel.getDate());
 
         BigDecimal gameInventoryPriceAmount = gameInventoryModel.getInventoryPriceModel().getAmount();

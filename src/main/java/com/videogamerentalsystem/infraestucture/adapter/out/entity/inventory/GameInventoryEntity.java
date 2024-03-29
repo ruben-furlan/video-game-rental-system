@@ -39,7 +39,7 @@ public class GameInventoryEntity {
     @Column(name = "TITLE")
     private String title;
 
-
+    @Enumerated(EnumType.STRING)
     @Column(name = "TYPE")
     private GameType type;
 
@@ -49,5 +49,9 @@ public class GameInventoryEntity {
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "GAME_INVENTORY_PRICE_ID")
     private GameInventoryPriceEntity inventoryPriceEntity;
+
+    public void updateStock(Integer stock) {
+        this.stock = stock;
+    }
 
 }
