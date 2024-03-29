@@ -33,7 +33,8 @@ public class RentalResponseApiMapper {
         return ResponseRentalCustomerDTO.builder()
                 .firstName(customerModel.getFirstName())
                 .latName(customerModel.getLatName())
-                .loyaltyPoints(customerModel.getLoyaltyPoints())
+                .documentNumber(customerModel.getDocumentNumber())
+                .totalLoyaltyPointsGenerated(customerModel.getLoyaltyPoints())
                 .build();
     }
 

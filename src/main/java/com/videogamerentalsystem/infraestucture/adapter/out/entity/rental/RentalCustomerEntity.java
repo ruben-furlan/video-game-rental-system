@@ -39,6 +39,9 @@ public class RentalCustomerEntity {
     @Column(name = "LAST_NAME")
     private String latName;
 
+    @Column(name = "DOCUMENT_NUMBER")
+    private String documentNumber;
+
     @Column(name = "LOYALTY_POINTS")
     private Integer loyaltyPoints;
 

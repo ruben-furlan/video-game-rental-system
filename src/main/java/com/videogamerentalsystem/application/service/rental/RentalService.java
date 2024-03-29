@@ -11,10 +11,14 @@ import com.videogamerentalsystem.domain.port.in.rental.command.RentalCommand;
 import com.videogamerentalsystem.domain.port.in.rental.command.RentalCustomerCommand;
 import com.videogamerentalsystem.domain.port.in.rental.command.RentalProductCommand;
 import com.videogamerentalsystem.domain.port.out.rental.RentalRepositoryPort;
+import com.videogamerentalsystem.infraestucture.exception.custom.ApiException;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -31,27 +35,31 @@ public class RentalService implements RentalUserCase {
 
     private final RentalPaymentCalculationService rentalPaymentCalculationService;
 
+    private final RentalLoyaltyService rentalLoyaltyService;
+
     @Override
     public RentalModel create(RentalCommand rentalCommand) {
-        RentalModel buildToModel = this.buildToModel(rentalCommand);
+
+        RentalModel buildToModel = this.buildToModelAndValidate(rentalCommand);
 
         Set<RentalProductModel> productModels = buildToModel.getProductModels();
 
         Set<GameInventoryModel> gameInventoryModels = this.gameInventoryService.stockExists(productModels);
 
-        if (CollectionUtils.isEmpty(gameInventoryModels)) {
-            throw new RuntimeException("No hay suficiente stock disponible para crear la renta");
-        } else {
+        this.rentalPaymentCalculationService.calculateAndSetRentalCost(buildToModel, gameInventoryModels);
 
-            this.rentalPaymentCalculationService.calculateAndSetRentalCost(buildToModel, gameInventoryModels);
+        Integer loyaltyPoints = this.rentalLoyaltyService.calculateTotalPoints(productModels);
 
-            RentalModel rentalModel = this.rentalRepositoryPort.create(buildToModel);
+        buildToModel.getCustomerModel().addLoyaltyPoints(loyaltyPoints);
 
-            this.gameInventoryService.stockRemove(gameInventoryModels);
+        RentalModel rentalModel = this.rentalRepositoryPort.create(buildToModel);
 
-            return rentalModel;
-        }
+
+        this.gameInventoryService.stockRemove(gameInventoryModels);
+
+        return rentalModel;
     }
+
 
     @Override
     public RentalProductModel findGameByTitleAndRentalId(String title, Long rentalId) {
@@ -59,7 +67,8 @@ public class RentalService implements RentalUserCase {
     }
 
 
-    private RentalModel buildToModel(RentalCommand rentalCommand) {
+    private RentalModel buildToModelAndValidate(RentalCommand rentalCommand) {
+        this.validateCommand(rentalCommand);
         RentalCustomerCommand rentalCustomerCommand = rentalCommand.customer();
 
         Set<RentalProductCommand> rentalProductCommands = rentalCommand.products();
@@ -74,6 +83,7 @@ public class RentalService implements RentalUserCase {
         RentalCustomerModel customerModel = RentalCustomerModel.builder()
                 .firstName(rentalCustomerCommand.firstName())
                 .latName(rentalCustomerCommand.lastName())
+                .documentNumber(rentalCustomerCommand.DocumentNumber())
                 .build();
 
         return RentalModel.builder().date(LocalDateTime.now())
@@ -82,6 +92,19 @@ public class RentalService implements RentalUserCase {
                 .customerModel(customerModel)
                 .productModels(productModels)
                 .build();
+    }
+
+    private  void validateCommand(RentalCommand rentalCommand) {
+        Map<String, Long> titleCounts = rentalCommand.products().stream()
+                .collect(Collectors.groupingBy(RentalProductCommand::title, Collectors.counting()));
+        List<String> duplicateTitles = titleCounts.entrySet().stream()
+                .filter(entry -> entry.getValue() > 1)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        if (!duplicateTitles.isEmpty()) {
+            String errorMessage = "Títulos duplicados encontrados: %s".formatted(duplicateTitles);
+            throw new ApiException(errorMessage, HttpStatus.BAD_REQUEST);
+        }
     }
 
 
