@@ -5,11 +5,18 @@ import com.videogamerentalsystem.domain.model.inventory.GameInventoryPriceModel;
 import com.videogamerentalsystem.infraestucture.adapter.out.entity.inventory.GameInventoryEntity;
 import com.videogamerentalsystem.infraestucture.adapter.out.entity.inventory.GameInventoryPriceEntity;
 
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 
 @Component
 public class GameInventoryMapper {
+
+    public Set<GameInventoryEntity> toEntityGameInventories(Set<GameInventoryModel> gameInventoryModel) {
+        return CollectionUtils.isEmpty(gameInventoryModel) ? null : gameInventoryModel.stream().map(this::toEntityGameInventory).collect(Collectors.toSet());
+    }
 
     public GameInventoryEntity toEntityGameInventory(GameInventoryModel gameInventoryModel) {
         GameInventoryPriceEntity priceEntity = this.toEntityGameInventoryPrice(gameInventoryModel.getInventoryPriceModel());

@@ -8,11 +8,15 @@ import com.videogamerentalsystem.domain.port.in.inventory.GameInventoryUserCase;
 import com.videogamerentalsystem.domain.port.in.inventory.commad.GameInventoryCommand;
 import com.videogamerentalsystem.domain.port.in.inventory.commad.GameInventoryPriceCommand;
 import com.videogamerentalsystem.domain.port.out.inventory.GameInventoryRepositoryPort;
+import com.videogamerentalsystem.infraestucture.adapter.out.entity.inventory.GameInventoryEntity;
 import com.videogamerentalsystem.infraestucture.exception.custom.ApiException;
-import java.util.Collections;
+import com.videogamerentalsystem.infraestucture.exception.custom.ApiExceptionConstantsMessagesError;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -52,16 +56,19 @@ public class GameInventoryService implements GameInventoryUserCase {
     }
 
 
+
     @Override
     public void stockRemove(Set<GameInventoryModel> gameInventoryModels) {
-
+        gameInventoryModels.forEach(gameInventoryModelCurrent -> {
+            Integer newStock = gameInventoryModelCurrent.getStock() - 1;
+            this.gameInventoryRepositoryPort.updateStock(gameInventoryModelCurrent.getId(), newStock);
+        });
     }
 
     @Override
     public void stackAdd(Set<GameInventoryModel> gameInventoryModels) {
 
     }
-
 
     private GameInventoryModel buildToModelAndValidate(GameInventoryCommand gameInventoryCommand) {
         String title = gameInventoryCommand.title();
@@ -84,11 +91,6 @@ public class GameInventoryService implements GameInventoryUserCase {
                 .type(gameInventoryCommand.type())
                 .stock(gameInventoryCommand.stock())
                 .inventoryPriceModel(gameInventoryPriceModel).build();
-    }
-
-
-    private Set<GameInventoryModel> isNoStockForAnyProductEmptyList() {
-        return Collections.emptySet();
     }
 
     private boolean allMatchStock(Set<GameInventoryModel> gameInventoryModels) {
