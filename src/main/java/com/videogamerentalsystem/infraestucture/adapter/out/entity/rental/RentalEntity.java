@@ -1,9 +1,12 @@
 package com.videogamerentalsystem.infraestucture.adapter.out.entity.rental;
 
 
+import com.videogamerentalsystem.domain.model.rental.constant.RentalPaymentType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -42,8 +45,9 @@ public class RentalEntity {
     @Column(name = "CURRENCY")
     private String currency;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "PAYMENT_TYPE")
-    private String paymentType;
+    private RentalPaymentType paymentType;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "CUSTOMER_ID")

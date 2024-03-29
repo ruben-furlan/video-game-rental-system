@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Builder
 @NoArgsConstructor
@@ -49,4 +50,7 @@ public class RentalProductEntity {
     @JoinColumn(name = "RENTAL_ID")
     private RentalEntity rental;
 
+    public void addJoin(RentalEntity rentalEntity) {
+        this.rental = rentalEntity;
+    }
 }

@@ -18,6 +18,7 @@ public class GameInventoryResponseApiMapper {
                 .price(this.toResponsePriceModelApi(gameInventoryModel.getInventoryPriceModel()))
                 .build();
     }
+
     private ResponseInventoryPriceDTO toResponsePriceModelApi(GameInventoryPriceModel inventoryPriceModel) {
         return ResponseInventoryPriceDTO.builder()
                 .type(inventoryPriceModel.getType())

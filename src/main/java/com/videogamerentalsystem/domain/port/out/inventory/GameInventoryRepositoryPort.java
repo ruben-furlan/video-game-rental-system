@@ -9,4 +9,10 @@ public interface GameInventoryRepositoryPort {
 
     public Optional<GameInventoryModel> findByID(Long id);
 
+    public Optional<GameInventoryModel> findByTitle(String title);
+
+    public void removeStock(Long id);
+
+    public void addStock(Long id) ;
+
 }

@@ -1,19 +1,17 @@
-package com.videogamerentalsystem.domain.model.rental;
+package com.videogamerentalsystem.infraestucture.adapter.out.dto.rental;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
-
 
 @Getter
 @Builder
-@Setter
-public class RentalProductModel {
+public class ResponseProductDTO {
     private Long id;
     private String title;
     private String type;
     private Integer numberDays;
     private LocalDateTime endDate;
-    private RentalProductChargeModel charges;
+    private ResponseProductChargeDTO charges;
 }
