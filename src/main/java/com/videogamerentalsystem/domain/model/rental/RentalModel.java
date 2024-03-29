@@ -10,6 +10,7 @@ import lombok.Getter;
 public class RentalModel {
     private Long id;
     private LocalDateTime date;
+    private Integer numberDate;
     private String currency;
     private String paymentType;
     private RentalCustomerModel customerModel;

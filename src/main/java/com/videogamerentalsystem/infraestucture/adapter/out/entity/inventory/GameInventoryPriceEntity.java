@@ -15,13 +15,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
 @Entity
 @Table(name = "GAME_INVENTORY_PRICE")
 public class GameInventoryPriceEntity {
@@ -46,5 +44,9 @@ public class GameInventoryPriceEntity {
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "GAME_INVENTORY_ID")
     private GameInventoryEntity gameInventoryEntity;
+
+    public void addJoin(GameInventoryEntity gameInventoryEntity) {
+        this.gameInventoryEntity = gameInventoryEntity;
+    }
 
 }

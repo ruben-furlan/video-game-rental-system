@@ -2,13 +2,14 @@ package com.videogamerentalsystem.infraestucture.adapter.out.mapper.rental;
 
 import com.videogamerentalsystem.domain.model.rental.RentalCustomerModel;
 import com.videogamerentalsystem.domain.model.rental.RentalModel;
+import com.videogamerentalsystem.domain.model.rental.RentalProductChargeModel;
 import com.videogamerentalsystem.domain.model.rental.RentalProductModel;
+import com.videogamerentalsystem.domain.model.rental.RentalProductSurchargeModel;
 import com.videogamerentalsystem.infraestucture.adapter.out.dto.rental.ResponseProductChargeDTO;
 import com.videogamerentalsystem.infraestucture.adapter.out.dto.rental.ResponseProductDTO;
 import com.videogamerentalsystem.infraestucture.adapter.out.dto.rental.ResponseProductSurchargesDTO;
 import com.videogamerentalsystem.infraestucture.adapter.out.dto.rental.ResponseRentalCustomerDTO;
 import com.videogamerentalsystem.infraestucture.adapter.out.dto.rental.ResponseRentalDTO;
-import java.math.BigDecimal;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
@@ -16,49 +17,53 @@ import org.springframework.stereotype.Component;
 @Component
 public class RentalResponseApiMapper {
 
-
     public ResponseRentalDTO toResponseApi(RentalModel rentalModel) {
+        return ResponseRentalDTO.builder()
+                .id(rentalModel.getId())
+                .date(rentalModel.getDate())
+                .numberDate(rentalModel.getNumberDate())
+                .currency(rentalModel.getCurrency())
+                .paymentType(rentalModel.getPaymentType())
+                .customer(this.toResponseRentalCustomerApi(rentalModel.getCustomerModel()))
+                .products(this.toResponseProductsApi(rentalModel.getProductModels()))
+                .build();
+    }
 
-        RentalCustomerModel customerModel = rentalModel.getCustomerModel();
-
-        ResponseRentalCustomerDTO customerDTO = ResponseRentalCustomerDTO.builder()
+    private ResponseRentalCustomerDTO toResponseRentalCustomerApi(RentalCustomerModel customerModel) {
+        return ResponseRentalCustomerDTO.builder()
                 .firstName(customerModel.getFirstName())
                 .latName(customerModel.getLatName())
                 .loyaltyPoints(customerModel.getLoyaltyPoints())
                 .build();
+    }
 
+    private Set<ResponseProductDTO> toResponseProductsApi(Set<RentalProductModel> productModels) {
+        return productModels.stream().map(this::toResponseProductApi).collect(Collectors.toSet());
+    }
 
-        Set<RentalProductModel> productModels = rentalModel.getProductModels();
-
-        Set<ResponseProductDTO> productDTOS = productModels.stream().map(p -> {
-            ResponseProductSurchargesDTO surchages = ResponseProductSurchargesDTO.builder().amount(BigDecimal.valueOf(100))
-                    .reason("hola").build();
-
-            ResponseProductChargeDTO charges = ResponseProductChargeDTO.builder()
-                    .price(p.getPrice())
-                    .surcharges(surchages)
-                    .total(p.getPrice().add(surchages.getAmount())).build();
-
-
-            return ResponseProductDTO.builder()
-                    .id(p.getId())
-                    .title(p.getTitle())
-                    .type(p.getType())
-                    .numberDate(1)
-                    .endDate(p.getEndDate())
-                    .charges(charges).build();
-        }).collect(Collectors.toSet());
-
-
-        return ResponseRentalDTO.builder()
-                .id(rentalModel.getId())
-                .date(rentalModel.getDate())
-                .currency(rentalModel.getCurrency())
-                .paymentType(rentalModel.getPaymentType())
-                .customer(customerDTO)
-                .products(productDTOS)
+    private ResponseProductDTO toResponseProductApi(RentalProductModel rentalProductModel) {
+        return ResponseProductDTO.builder()
+                .id(rentalProductModel.getId())
+                .title(rentalProductModel.getTitle())
+                .type(rentalProductModel.getType())
+                .endDate(rentalProductModel.getEndDate())
+                .charges(this.toResponseProductChargeApi(rentalProductModel.getCharges()))
                 .build();
     }
 
+    private ResponseProductChargeDTO toResponseProductChargeApi(RentalProductChargeModel chargeModel) {
+        return ResponseProductChargeDTO.builder()
+                .price(chargeModel.getPrice())
+                .surcharges(this.toResponseProductSurchargeApi(chargeModel.getSurcharges()))
+                .total(chargeModel.getTotal())
+                .build();
+    }
+
+    private ResponseProductSurchargesDTO toResponseProductSurchargeApi(RentalProductSurchargeModel surchargesModel) {
+        return ResponseProductSurchargesDTO.builder()
+                .amount(surchargesModel.getAmount())
+                .reason(surchargesModel.getReason())
+                .build();
+    }
 
 }

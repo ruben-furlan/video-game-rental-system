@@ -1,6 +1,5 @@
 package com.videogamerentalsystem.domain.model.rental;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,6 +10,7 @@ public class RentalProductModel {
     private Long id;
     private String title;
     private String type;
+    private Integer numberDate;
     private LocalDateTime endDate;
-    private BigDecimal price;
+    private RentalProductChargeModel charges;
 }

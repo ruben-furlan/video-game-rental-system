@@ -2,11 +2,11 @@ package com.videogamerentalsystem.infraestucture.adapter.out.mapper.rental;
 
 import com.videogamerentalsystem.domain.model.rental.RentalCustomerModel;
 import com.videogamerentalsystem.domain.model.rental.RentalModel;
+import com.videogamerentalsystem.domain.model.rental.RentalProductChargeModel;
 import com.videogamerentalsystem.domain.model.rental.RentalProductModel;
 import com.videogamerentalsystem.infraestucture.adapter.out.entity.rental.RentalCustomerEntity;
 import com.videogamerentalsystem.infraestucture.adapter.out.entity.rental.RentalEntity;
 import com.videogamerentalsystem.infraestucture.adapter.out.entity.rental.RentalProductEntity;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
@@ -17,52 +17,47 @@ public class RentalMapper {
 
     public RentalEntity toRentalEntity(RentalModel rentalModel) {
         RentalEntity.RentalEntityBuilder rentalEntityBuilder = RentalEntity.builder();
-
-        RentalCustomerModel customerModel = rentalModel.getCustomerModel();
-        RentalCustomerEntity.RentalCustomerEntityBuilder customerEntityBuilder = RentalCustomerEntity.builder();
-
-        RentalCustomerEntity rentalCustomerEntity = this.toRentalCustomerEntity(customerModel, customerEntityBuilder);
-
-        Set<RentalProductEntity> rentalProducts = this.toRentalProductsEntity(rentalModel.getProductModels(), rentalEntityBuilder.build());
+        RentalCustomerEntity rentalCustomerEntity = this.toRentalCustomerEntity(rentalModel.getCustomerModel());
+        Set<RentalProductEntity> rentalProductEntities = this.toRentalProductsEntity(rentalModel.getProductModels());
         RentalEntity rentalEntity = rentalEntityBuilder.date(rentalModel.getDate())
                 .currency(rentalModel.getCurrency())
                 .paymentType(rentalModel.getPaymentType())
-                .rentalProducts(rentalProducts)
+                .rentalProducts(rentalProductEntities)
                 .customer(rentalCustomerEntity)
                 .build();
 
-        this.joinRelationship(rentalCustomerEntity, rentalProducts, rentalEntity);
+        this.joinRelationship(rentalCustomerEntity, rentalProductEntities, rentalEntity);
 
         return rentalEntity;
     }
 
-    private  RentalCustomerEntity toRentalCustomerEntity(RentalCustomerModel customerModel, RentalCustomerEntity.RentalCustomerEntityBuilder customerEntityBuilder) {
-        return customerEntityBuilder.firstName(customerModel.getFirstName())
+    private RentalCustomerEntity toRentalCustomerEntity(RentalCustomerModel customerModel) {
+        return RentalCustomerEntity.builder()
+                .firstName(customerModel.getFirstName())
                 .latName(customerModel.getLatName())
                 .loyaltyPoints(1)
                 .build();
     }
 
     private void joinRelationship(RentalCustomerEntity customer, Set<RentalProductEntity> rentalProducts, RentalEntity rentalEntity) {
-        customer.setRental(rentalEntity);
+        customer.addJoin(rentalEntity);
         this.jointProductEntityToRental(rentalProducts, rentalEntity);
     }
 
 
-    private Set<RentalProductEntity> toRentalProductsEntity(Set<RentalProductModel> rentalProductModels, RentalEntity rentalEntity) {
+    private Set<RentalProductEntity> toRentalProductsEntity(Set<RentalProductModel> rentalProductModels) {
         return CollectionUtils.isEmpty(rentalProductModels) ? null : rentalProductModels
                 .stream()
-                .map(rentalProductModel -> this.toRentalProductEntity(rentalProductModel, rentalEntity))
+                .map(this::toRentalProductEntity)
                 .collect(Collectors.toSet());
     }
 
-    private RentalProductEntity toRentalProductEntity(RentalProductModel rentalProductModel, RentalEntity rentalEntity) {
+    private RentalProductEntity toRentalProductEntity(RentalProductModel rentalProductModel) {
         return RentalProductEntity.builder()
                 .title(rentalProductModel.getTitle())
                 .type(rentalProductModel.getType())
                 .endDate(rentalProductModel.getEndDate())
-                .price(rentalProductModel.getPrice())
-                .rental(rentalEntity)
+                .price(rentalProductModel.getCharges().getPrice())
                 .build();
     }
 
@@ -77,8 +72,8 @@ public class RentalMapper {
                 .build();
     }
 
-    public RentalCustomerModel toRentalCustomerModel(RentalCustomerEntity rentalCustomerEntity){
-     return    RentalCustomerModel.builder()
+    public RentalCustomerModel toRentalCustomerModel(RentalCustomerEntity rentalCustomerEntity) {
+        return RentalCustomerModel.builder()
                 .firstName(rentalCustomerEntity.getFirstName())
                 .latName(rentalCustomerEntity.getLatName())
                 .loyaltyPoints(rentalCustomerEntity.getLoyaltyPoints())
@@ -98,14 +93,14 @@ public class RentalMapper {
                 .title(rentalProductEntity.getTitle())
                 .type(rentalProductEntity.getType())
                 .endDate(rentalProductEntity.getEndDate())
-                .price(rentalProductEntity.getPrice())
+                .charges(RentalProductChargeModel.builder().price(rentalProductEntity.getPrice()).build())
                 .build();
     }
 
 
     private void jointProductEntityToRental(Set<RentalProductEntity> rentalProducts, RentalEntity rentalEntity) {
         if (CollectionUtils.isEmpty(rentalProducts) == Boolean.FALSE) {
-            rentalProducts.forEach(join -> join.setRental(rentalEntity));
+            rentalProducts.forEach(rentalProduct -> rentalProduct.addJoin(rentalEntity));
         }
     }
 
