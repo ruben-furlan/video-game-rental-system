@@ -11,15 +11,10 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
 @Configuration
 public class PersistenceConfig {
-
     private static final String ORG_H_2_DRIVER = "org.h2.Driver";
     private static final String DB_JDBC_H_2_MEM_TEST = "jdbc:h2:mem:testdb";
-    private static  final String DB_INIT_STRUCTURE = "db/init_structure.sql";
-    private static  final String DB_DATA = "db/data.sql";
-    //default value
     private static final String DB_USER_NAME = "SA";
     private static final String DB_PASS = "";
-
 
     @Profile("test")
     @Bean
@@ -36,14 +31,7 @@ public class PersistenceConfig {
     public DataSourceInitializer dataSourceInitializer(DataSource dataSource) {
         DataSourceInitializer initializer = new DataSourceInitializer();
         initializer.setDataSource(dataSource);
-        initializer.setDatabasePopulator(databasePopulator());
         return initializer;
     }
 
-    private ResourceDatabasePopulator databasePopulator() {
-        ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-        populator.addScript(new ClassPathResource(DB_INIT_STRUCTURE));
-      //  populator.addScript(new ClassPathResource(DB_DATA));
-        return populator;
-    }
 }
