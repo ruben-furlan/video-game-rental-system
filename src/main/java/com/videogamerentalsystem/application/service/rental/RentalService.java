@@ -73,17 +73,17 @@ public class RentalService implements RentalUserCase {
             throw new ApiException("The product  %d finished, please check the rent: %d".formatted(rentalProductId, rentalId), HttpStatus.BAD_REQUEST);
         }
 
-        GameInventoryModel inventoryModel = this.gameInventoryService.findInventoryByTitle(productModel.getTitle()).orElseThrow(() -> new ApiException(ApiExceptionConstantsMessagesError.PRODUCT_TITLE_NOT_FOUND, HttpStatus.NOT_FOUND));
+        GameInventoryModel gameInventoryModel = this.gameInventoryService.findInventoryByTitle(productModel.getTitle()).orElseThrow(() -> new ApiException(ApiExceptionConstantsMessagesError.PRODUCT_TITLE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         this.rentalPaymentCalculationService.applySurchargeForProduct(productModel);
 
-        RentalProductChargeModel charges = productModel.getCharges();
+        RentalProductChargeModel rentalProductChargeModel = productModel.getCharges();
 
-        this.rentalRepositoryPort.updateStatusProductAndPrice(rentalId, productModel.getId(), this.evaluateAndApplyIfPriceChangeOrKeepCurrent(charges.getTotal(), charges.getPrice()), RentalProductStatus.FINISH);
+        this.rentalRepositoryPort.updateStatusProductAndPrice(rentalId, productModel.getId(), this.evaluateAndApplyIfPriceChangeOrKeepCurrent(rentalProductChargeModel.getTotal(), rentalProductChargeModel.getPrice()), RentalProductStatus.FINISH);
 
         productModel.updateStatus(RentalProductStatus.FINISH);
 
-        this.gameInventoryService.stockAdd(inventoryModel);
+        this.gameInventoryService.stockAdd(gameInventoryModel);
 
         return rentalModel;
     }
