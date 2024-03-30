@@ -8,7 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SpringDataJpaGameInventory  extends JpaRepository<GameInventoryEntity, Long> {
 
-    Optional<GameInventoryEntity> findFirstByInventoryPriceEntityId(Long inventoryPriceEntityId);
-
     Optional<GameInventoryEntity> findFirstByTitle(String title);
 }

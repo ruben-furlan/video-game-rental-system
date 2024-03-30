@@ -38,8 +38,8 @@ public class GameInventoryService implements GameInventoryUserCase {
     }
 
     @Override
-    public Optional<GameInventoryModel> findInventoryByProductId(Long productId) {
-        return this.gameInventoryRepositoryPort.findByProductId(productId);
+    public Optional<GameInventoryModel> findInventoryByTitle(String title) {
+        return this.gameInventoryRepositoryPort.findByTitle(title);
     }
 
 
@@ -61,8 +61,9 @@ public class GameInventoryService implements GameInventoryUserCase {
     }
 
     @Override
-    public void stockAdd(Set<GameInventoryModel> gameInventoryModels) {
-
+    public void stockAdd(GameInventoryModel gameInventoryModel) {
+        int newStock = gameInventoryModel.getStock() + 1;
+        this.gameInventoryRepositoryPort.updateStock(gameInventoryModel.getId(), newStock);
     }
 
 

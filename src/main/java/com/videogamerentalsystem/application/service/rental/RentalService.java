@@ -65,12 +65,12 @@ public class RentalService implements RentalUserCase {
 
 
     @Override
-    public RentalModel  handBackGame(Long rentalId,  Long productId) {
+    public RentalModel  handBackGame(Long rentalId,  Long rentalProductId) {
         RentalModel rentalModel = this.rentalRepositoryPort.findRentalById(rentalId).orElseThrow(() -> new ApiException(ApiExceptionConstantsMessagesError.RENTAL_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        GameInventoryModel inventoryModel = this.gameInventoryService.findInventoryByProductId(productId).orElseThrow(() -> new ApiException(ApiExceptionConstantsMessagesError.PRODUCT_TITLE_NOT_FOUND, HttpStatus.NOT_FOUND));
+        RentalProductModel productModel = this.fidRentalProductModel(rentalProductId, rentalModel);
 
-        RentalProductModel productModel = this.fidRentalProductModelByTitle(rentalModel, inventoryModel.getId());
+        GameInventoryModel inventoryModel = this.gameInventoryService.findInventoryByTitle(productModel.getTitle()).orElseThrow(() -> new ApiException(ApiExceptionConstantsMessagesError.PRODUCT_TITLE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         this.rentalPaymentCalculationService.applySurchargeForProduct(productModel);
 
@@ -80,7 +80,13 @@ public class RentalService implements RentalUserCase {
 
         productModel.updateStatus(RentalProductStatus.FINISH);
 
+        this.gameInventoryService.stockAdd(inventoryModel);
+
         return rentalModel;
+    }
+
+    private  RentalProductModel fidRentalProductModel(Long rentalId, RentalModel rentalModel) {
+        return rentalModel.getProductModels().stream().filter(productModel -> productModel.getId().equals(rentalId)).findFirst().orElseThrow(() -> new ApiException(ApiExceptionConstantsMessagesError.MESSAGE_GENERIC, HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
 
@@ -88,13 +94,6 @@ public class RentalService implements RentalUserCase {
     public RentalModel get(Long rentalId) {
        return  this.rentalRepositoryPort.findRentalById(rentalId).orElseThrow(() -> new ApiException(ApiExceptionConstantsMessagesError.RENTAL_NOT_FOUND, HttpStatus.NOT_FOUND));
     }
-
-    private  RentalProductModel fidRentalProductModelByTitle(RentalModel rentalModel, Long productId) {
-        return rentalModel.getProductModels()
-                .stream().filter(productModel -> Objects.equals(productModel.getId(), productId)).findFirst()
-                .orElseThrow(() -> new ApiException(ApiExceptionConstantsMessagesError.MESSAGE_GENERIC, HttpStatus.INTERNAL_SERVER_ERROR));
-    }
-
 
     private RentalModel buildToModelAndValidate(RentalCommand rentalCommand) {
         this.validateCommand(rentalCommand);

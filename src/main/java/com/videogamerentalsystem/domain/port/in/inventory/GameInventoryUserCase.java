@@ -27,13 +27,14 @@ public interface GameInventoryUserCase {
      */
     Optional<GameInventoryModel> findInventoryById(Long id);
 
+
     /**
-     * Finds the game inventory by its associated product identifier.
+     * Finds a game inventory by its title.
      *
-     * @param productId The identifier of the associated product.
-     * @return An optional containing the game inventory model if found, otherwise empty.
+     * @param title The title of the game inventory to find.
+     * @return An Optional containing the game inventory if found, or empty if not found.
      */
-    Optional<GameInventoryModel> findInventoryByProductId(Long productId);
+    Optional<GameInventoryModel> findInventoryByTitle(String title);
 
     /**
      * Checks if the stock exists for the provided set of rental product models.
@@ -51,9 +52,9 @@ public interface GameInventoryUserCase {
     void stockRemove(Set<GameInventoryModel> gameInventoryModels);
 
     /**
-     * Adds stock to the game inventory for the provided set of game inventory models.
+     * Add stock to the game inventory for the provided set of game inventory model.
      *
-     * @param gameInventoryModels The set of game inventory models for which to add stock.
+     * @param gameInventoryModel game inventory models for which to add stock.
      */
-    void stockAdd(Set<GameInventoryModel> gameInventoryModels);
+    void stockAdd(GameInventoryModel gameInventoryModels);
 }

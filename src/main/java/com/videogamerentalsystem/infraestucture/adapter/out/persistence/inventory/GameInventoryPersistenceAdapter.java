@@ -8,9 +8,7 @@ import com.videogamerentalsystem.infraestucture.adapter.out.entity.inventory.Gam
 import com.videogamerentalsystem.infraestucture.adapter.out.mapper.inventory.GameInventoryMapper;
 import com.videogamerentalsystem.infraestucture.adapter.out.repository.SpringDataJpaGameInventory;
 import com.videogamerentalsystem.infraestucture.exception.custom.ApiException;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Propagation;
@@ -36,11 +34,6 @@ public class GameInventoryPersistenceAdapter implements GameInventoryRepositoryP
     }
 
     @Override
-    public Optional<GameInventoryModel> findByProductId(Long productId) {
-        return this.springDataJpaGameInventory.findFirstByInventoryPriceEntityId(productId).map(this.gameInventoryMapper::toModelGameInventory);
-    }
-
-    @Override
     public Optional<GameInventoryModel> findByTitle(String title) {
         return this.springDataJpaGameInventory.findFirstByTitle(title).map(this.gameInventoryMapper::toModelGameInventory);
     }
@@ -53,12 +46,8 @@ public class GameInventoryPersistenceAdapter implements GameInventoryRepositoryP
             gameInventoryEntity.updateStock(stock);
             this.springDataJpaGameInventory.save(gameInventoryEntity);
         } else {
-            throw new ApiException("Game inventory with id " + id + " not found", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ApiException("Game inventory with id %d not found".formatted(id), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Override
-    public void addStock(Long id) {
-
-    }
 }
