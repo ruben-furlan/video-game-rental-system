@@ -64,10 +64,10 @@ public class TestRentalHelper {
     public static RentalModel generateRentalDefaultMode() {
         RentalCustomerModel rentalCustomerModel = generateRentalCustomerModel(10);
         List<RentalProductModel> rentalProductModels = Arrays.asList(
-                generateRentalProductGameNewRelease(RentalProductStatus.IN_PROGRESS, TestGameInventoryHelper.TITLE_GAME_NEW_RELEASE, GameType.NEW_RELEASE, DateFormatter.toLocalDateTime("2024-04-04T23:59:59"), BigDecimal.valueOf(20.00)),
-                generateRentalProductGameNewRelease(RentalProductStatus.IN_PROGRESS, TestGameInventoryHelper.TITLE_GAME_STANDARD, GameType.STANDARD, DateFormatter.toLocalDateTime("2024-04-04T23:59:59"), BigDecimal.valueOf(6.00)),
-                generateRentalProductGameNewRelease(RentalProductStatus.IN_PROGRESS, TestGameInventoryHelper.TITLE_GAME_CLASSIC, GameType.CLASSIC, DateFormatter.toLocalDateTime("2024-04-04T23:59:59"), BigDecimal.valueOf(6.00)),
-                generateRentalProductGameNewRelease(RentalProductStatus.IN_PROGRESS, TestGameInventoryHelper.TITLE_GAME_CLASSIC_2, GameType.CLASSIC, DateFormatter.toLocalDateTime("2024-04-04T23:59:59"), BigDecimal.valueOf(3.00))
+                generateRentalProductGame(RentalProductStatus.IN_PROGRESS, TestGameInventoryHelper.TITLE_GAME_NEW_RELEASE, GameType.NEW_RELEASE, DateFormatter.toLocalDateTime("2024-04-04T23:59:59"), BigDecimal.valueOf(20.00)),
+                generateRentalProductGame(RentalProductStatus.IN_PROGRESS, TestGameInventoryHelper.TITLE_GAME_STANDARD, GameType.STANDARD, DateFormatter.toLocalDateTime("2024-04-04T23:59:59"), BigDecimal.valueOf(6.00)),
+                generateRentalProductGame(RentalProductStatus.IN_PROGRESS, TestGameInventoryHelper.TITLE_GAME_CLASSIC, GameType.CLASSIC, DateFormatter.toLocalDateTime("2024-04-04T23:59:59"), BigDecimal.valueOf(6.00)),
+                generateRentalProductGame(RentalProductStatus.IN_PROGRESS, TestGameInventoryHelper.TITLE_GAME_CLASSIC_2, GameType.CLASSIC, DateFormatter.toLocalDateTime("2024-04-04T23:59:59"), BigDecimal.valueOf(3.00))
         );
 
         return RentalModel.builder()
@@ -82,10 +82,10 @@ public class TestRentalHelper {
     public static RentalModel generateRentalDefaultModeProductFinish() {
         RentalCustomerModel rentalCustomerModel = generateRentalCustomerModel(10);
         List<RentalProductModel> rentalProductModels = Arrays.asList(
-                generateRentalProductGameNewRelease(RentalProductStatus.FINISH, TestGameInventoryHelper.TITLE_GAME_NEW_RELEASE, GameType.NEW_RELEASE, DateFormatter.toLocalDateTime("2024-04-04T23:59:59"), BigDecimal.valueOf(20.00)),
-                generateRentalProductGameNewRelease(RentalProductStatus.FINISH, TestGameInventoryHelper.TITLE_GAME_STANDARD, GameType.STANDARD, DateFormatter.toLocalDateTime("2024-04-04T23:59:59"), BigDecimal.valueOf(6.00)),
-                generateRentalProductGameNewRelease(RentalProductStatus.FINISH, TestGameInventoryHelper.TITLE_GAME_CLASSIC, GameType.CLASSIC, DateFormatter.toLocalDateTime("2024-04-04T23:59:59"), BigDecimal.valueOf(6.00)),
-                generateRentalProductGameNewRelease(RentalProductStatus.FINISH, TestGameInventoryHelper.TITLE_GAME_CLASSIC_2, GameType.CLASSIC, DateFormatter.toLocalDateTime("2024-04-04T23:59:59"), BigDecimal.valueOf(3.00))
+                generateRentalProductGame(RentalProductStatus.FINISH, TestGameInventoryHelper.TITLE_GAME_NEW_RELEASE, GameType.NEW_RELEASE, DateFormatter.toLocalDateTime("2024-04-04T23:59:59"), BigDecimal.valueOf(20.00)),
+                generateRentalProductGame(RentalProductStatus.FINISH, TestGameInventoryHelper.TITLE_GAME_STANDARD, GameType.STANDARD, DateFormatter.toLocalDateTime("2024-04-04T23:59:59"), BigDecimal.valueOf(6.00)),
+                generateRentalProductGame(RentalProductStatus.FINISH, TestGameInventoryHelper.TITLE_GAME_CLASSIC, GameType.CLASSIC, DateFormatter.toLocalDateTime("2024-04-04T23:59:59"), BigDecimal.valueOf(6.00)),
+                generateRentalProductGame(RentalProductStatus.FINISH, TestGameInventoryHelper.TITLE_GAME_CLASSIC_2, GameType.CLASSIC, DateFormatter.toLocalDateTime("2024-04-04T23:59:59"), BigDecimal.valueOf(3.00))
         );
 
         return RentalModel.builder()
@@ -101,7 +101,7 @@ public class TestRentalHelper {
         return RentalCustomerModel.builder().firstName(Customer.FIRST_NAME).latName(Customer.LAST_NAME).documentNumber(Customer.DOCUMENT_NUMBER).loyaltyPoints(loyaltyPoint).build();
     }
 
-    public static RentalProductModel generateRentalProductGameNewRelease(RentalProductStatus status, String title, GameType type, LocalDateTime endDate, BigDecimal price) {
+    public static RentalProductModel generateRentalProductGame(RentalProductStatus status, String title, GameType type, LocalDateTime endDate, BigDecimal price) {
         return RentalProductModel.builder()
                 .id(1L)
                 .status(status)
