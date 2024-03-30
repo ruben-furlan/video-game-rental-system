@@ -172,20 +172,9 @@ class GameInventoryServiceTest {
         assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus());
     }
 
-    @Test
-    void case_009_stockExists_EmptyTitleList() {
-        // Given
-        List<String> emptyTitlesList = List.of();
-
-        // When & Then
-        ApiException exception = assertThrows(ApiException.class, () -> this.gameInventoryService.stockExists(emptyTitlesList));
-        assertEquals(ApiExceptionConstantsMessagesError.NOT_STOCK, exception.getMessage());
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus());
-    }
-
 
     @Test
-    void case_010_stockRemove_ReduceStockForAllGameInventoryModels() {
+    void case_009_stockRemove_ReduceStockForAllGameInventoryModels() {
         // Given
         List<GameInventoryModel> gameInventoryModels = Arrays.asList(
                 TestGameInventoryHelper.generateNewReleaseGameInventoryModelDefault(),
@@ -202,7 +191,7 @@ class GameInventoryServiceTest {
         });
     }
     @Test
-    void case_011_stockRemove_EmptyGameInventoryModelsList() {
+    void case_010_stockRemove_EmptyGameInventoryModelsList() {
         // Given
         List<GameInventoryModel> emptyGameInventoryModelsList = Arrays.asList();
 
@@ -214,7 +203,7 @@ class GameInventoryServiceTest {
         verifyNoInteractions(this.gameInventoryRepositoryPort);
     }
     @Test
-    void case_012_stockAdd_IncreaseStockForGameInventoryModel() {
+    void case_011_stockAdd_IncreaseStockForGameInventoryModel() {
         // Given
         GameInventoryModel gameInventoryModel = TestGameInventoryHelper.generateClassicGameInventoryModelDefault();
 

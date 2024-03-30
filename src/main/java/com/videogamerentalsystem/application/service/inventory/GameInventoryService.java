@@ -9,9 +9,11 @@ import com.videogamerentalsystem.domain.port.in.inventory.commad.GameInventoryPr
 import com.videogamerentalsystem.domain.port.out.inventory.GameInventoryRepositoryPort;
 import com.videogamerentalsystem.infraestucture.exception.custom.ApiException;
 import com.videogamerentalsystem.infraestucture.exception.custom.ApiExceptionConstantsMessagesError;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Propagation;
@@ -42,7 +44,7 @@ public class GameInventoryService implements GameInventoryUserCase {
 
     public List<GameInventoryModel> stockExists(List<String> titles) {
         List<GameInventoryModel> gameInventoryModels = this.gameInventoryRepositoryPort.findByTitles(titles);
-        if (this.allMatchStock(gameInventoryModels)) {
+        if (this.allMatchStock(titles,gameInventoryModels)) {
             return gameInventoryModels;
         }
         throw new ApiException(ApiExceptionConstantsMessagesError.NOT_STOCK, HttpStatus.BAD_REQUEST);
@@ -89,9 +91,24 @@ public class GameInventoryService implements GameInventoryUserCase {
                 .inventoryPriceModel(gameInventoryPriceModel).build();
     }
 
-    private boolean allMatchStock(List<GameInventoryModel> gameInventoryModels) {
-        return !gameInventoryModels.isEmpty() && gameInventoryModels.stream().allMatch(game -> Objects.nonNull(game) && game.getStock() > 0);
-    }
+    private boolean allMatchStock(List<String> titles, List<GameInventoryModel> gameInventoryModels) {
+        // Verificar si todos los títulos están presentes en los modelos de inventario
+        boolean allTitlesPresent = titles.stream()
+                .allMatch(title -> gameInventoryModels.stream()
+                        .anyMatch(model -> model.getTitle().equals(title)));
 
+        if (!allTitlesPresent) {
+            return false; // Si no todos los títulos están presentes, devolver falso
+        }
+
+        // Verificar si hay suficiente stock para cada título
+        boolean allStockAvailable = titles.stream()
+                .allMatch(title -> gameInventoryModels.stream()
+                        .filter(model -> model.getTitle().equals(title))
+                        .mapToLong(GameInventoryModel::getStock)
+                        .sum() > 0);
+
+        return allStockAvailable; // Devolver verdadero si hay suficiente stock para todos los títulos
+    }
 
 }
