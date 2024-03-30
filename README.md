@@ -137,6 +137,10 @@ curl --location 'http://localhost:8080/v1/video-game-rental-system/inventory/1'
 > - Los Ids de los productos en la RESPUESTA estan atados a A TU RESERVA NO al inventario
 > - La respuesta del servicio te retorna los precios y estado de los productos
 
+> [!WARNING] 
+> - EDITA LA FECHA DE ENTREGA DE PRODUCTO (end_date)
+>  - RESPETA EL FORMATO
+
 ```bash
 curl --location 'http://localhost:8080/v1/video-game-rental-system/rental' \
 --header 'Content-Type: application/json' \
