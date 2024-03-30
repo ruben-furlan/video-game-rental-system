@@ -3,7 +3,6 @@ package com.videogamerentalsystem.application.service.inventory;
 import com.videogamerentalsystem.common.UseCase;
 import com.videogamerentalsystem.domain.model.inventory.GameInventoryModel;
 import com.videogamerentalsystem.domain.model.inventory.GameInventoryPriceModel;
-import com.videogamerentalsystem.domain.model.rental.RentalProductModel;
 import com.videogamerentalsystem.domain.port.in.inventory.GameInventoryUserCase;
 import com.videogamerentalsystem.domain.port.in.inventory.commad.GameInventoryCommand;
 import com.videogamerentalsystem.domain.port.in.inventory.commad.GameInventoryPriceCommand;
@@ -13,7 +12,6 @@ import com.videogamerentalsystem.infraestucture.exception.custom.ApiExceptionCon
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Propagation;
@@ -42,9 +40,8 @@ public class GameInventoryService implements GameInventoryUserCase {
         return this.gameInventoryRepositoryPort.findByTitle(title);
     }
 
-
-    public List<GameInventoryModel> stockExists(List<RentalProductModel> productModels) {
-        List<GameInventoryModel> gameInventoryModels = this.findGameInventoryModelsByTitles(productModels);
+    public List<GameInventoryModel> stockExists(List<String> titles) {
+        List<GameInventoryModel> gameInventoryModels = this.gameInventoryRepositoryPort.findByTitles(titles);
         if (this.allMatchStock(gameInventoryModels)) {
             return gameInventoryModels;
         }
@@ -56,7 +53,9 @@ public class GameInventoryService implements GameInventoryUserCase {
     public void stockRemove(List<GameInventoryModel> gameInventoryModels) {
         gameInventoryModels.forEach(gameInventoryModelCurrent -> {
             Integer newStock = gameInventoryModelCurrent.getStock() - 1;
-            this.gameInventoryRepositoryPort.updateStock(gameInventoryModelCurrent.getId(), newStock);
+            if (newStock >= 0) {
+                this.gameInventoryRepositoryPort.updateStock(gameInventoryModelCurrent.getId(), newStock);
+            }
         });
     }
 
@@ -92,12 +91,6 @@ public class GameInventoryService implements GameInventoryUserCase {
 
     private boolean allMatchStock(List<GameInventoryModel> gameInventoryModels) {
         return !gameInventoryModels.isEmpty() && gameInventoryModels.stream().allMatch(game -> Objects.nonNull(game) && game.getStock() > 0);
-    }
-
-    private List<GameInventoryModel> findGameInventoryModelsByTitles(List<RentalProductModel> productModels) {
-        return productModels.stream()
-                .map(productModel -> this.gameInventoryRepositoryPort.findByTitle(productModel.getTitle()).orElse(null))
-                .collect(Collectors.toList());
     }
 
 

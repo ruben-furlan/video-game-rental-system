@@ -1,6 +1,7 @@
 package com.videogamerentalsystem.domain.port.out.inventory;
 
 import com.videogamerentalsystem.domain.model.inventory.GameInventoryModel;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -31,6 +32,16 @@ public interface GameInventoryRepositoryPort {
      * @return An optional containing the game inventory model if found, otherwise empty.
      */
     Optional<GameInventoryModel> findByTitle(String title);
+
+
+    /**
+     * Finds the game inventory by its title.
+     *
+     * @param title The title of the game inventory to find.
+     * @return An optional containing the game inventory model if found, otherwise empty.
+     */
+    List<GameInventoryModel> findByTitles(List<String> title);
+
 
     /**
      * Updates the stock quantity for the specified game inventory.

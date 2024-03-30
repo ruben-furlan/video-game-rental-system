@@ -8,6 +8,7 @@ import com.videogamerentalsystem.infraestucture.adapter.out.entity.inventory.Gam
 import com.videogamerentalsystem.infraestucture.adapter.out.mapper.inventory.GameInventoryMapper;
 import com.videogamerentalsystem.infraestucture.adapter.out.repository.SpringDataJpaGameInventory;
 import com.videogamerentalsystem.infraestucture.exception.custom.ApiException;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,12 @@ public class GameInventoryPersistenceAdapter implements GameInventoryRepositoryP
     @Override
     public Optional<GameInventoryModel> findByTitle(String title) {
         return this.springDataJpaGameInventory.findFirstByTitle(title).map(this.gameInventoryMapper::toModelGameInventory);
+    }
+
+    @Override
+    public List<GameInventoryModel> findByTitles(List<String> title) {
+        List<GameInventoryEntity> gameInventoryEntityList = this.springDataJpaGameInventory.findAllByTitleIn(title);
+        return  this.gameInventoryMapper.toModelGameInventories(gameInventoryEntityList);
     }
 
     @Override
