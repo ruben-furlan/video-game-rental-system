@@ -57,6 +57,7 @@ public class RentalMapper {
     private RentalProductEntity toRentalProductEntity(RentalProductModel rentalProductModel) {
         RentalProductEntity.RentalProductEntityBuilder builder = RentalProductEntity.builder();
         builder.title(rentalProductModel.getTitle())
+                .status(rentalProductModel.getStatus())
                 .type(rentalProductModel.getType())
                 .endDate(rentalProductModel.getEndDate());
 
@@ -98,6 +99,7 @@ public class RentalMapper {
         return RentalProductModel.builder()
                 .id(rentalProductEntity.getId())
                 .title(rentalProductEntity.getTitle())
+                .status(rentalProductEntity.getStatus())
                 .type(rentalProductEntity.getType())
                 .endDate(rentalProductEntity.getEndDate())
                 .charges(RentalProductChargeModel.builder().price(rentalProductEntity.getPrice()).build())

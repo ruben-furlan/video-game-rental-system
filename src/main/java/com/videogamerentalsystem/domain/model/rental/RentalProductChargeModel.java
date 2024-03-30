@@ -12,4 +12,14 @@ public class RentalProductChargeModel {
     private BigDecimal price;
     private RentalProductSurchargeModel surcharges;
     private BigDecimal total;
+
+    public void updateTotalAndPrice(BigDecimal total, BigDecimal price) {
+        this.total = total;
+        this.price = price;
+    }
+
+    public void addSurchargeModel(RentalProductSurchargeModel surcharges){
+        this.surcharges = surcharges;
+    }
+
 }

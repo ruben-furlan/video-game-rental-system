@@ -3,11 +3,13 @@ package com.videogamerentalsystem.infraestucture.adapter.out.persistence.rental;
 
 import com.videogamerentalsystem.common.PersistenceAdapter;
 import com.videogamerentalsystem.domain.model.rental.RentalModel;
-import com.videogamerentalsystem.domain.model.rental.RentalProductModel;
+import com.videogamerentalsystem.domain.model.rental.constant.RentalProductStatus;
 import com.videogamerentalsystem.domain.port.out.rental.RentalRepositoryPort;
 import com.videogamerentalsystem.infraestucture.adapter.out.entity.rental.RentalEntity;
+import com.videogamerentalsystem.infraestucture.adapter.out.entity.rental.RentalProductEntity;
 import com.videogamerentalsystem.infraestucture.adapter.out.mapper.rental.RentalMapper;
 import com.videogamerentalsystem.infraestucture.adapter.out.repository.SpringDataJpaRental;
+import java.math.BigDecimal;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +28,23 @@ public class RentalPersistenceAdapter implements RentalRepositoryPort {
     }
 
     @Override
-    public Optional<RentalProductModel> findGameByTitleAndRentalId(String tile, Long rentalId) {
-       return this.springDataJpaRental.findRentalProductByTitleAndRentalId(tile, rentalId).map(this.rentalMapper::toRentalProductModel);
+    public Optional<RentalModel> findRentalById(Long id) {
+        Optional<RentalEntity> findRentalEntityById = this.springDataJpaRental.findById(id);
+        return findRentalEntityById.map(this.rentalMapper::toRentalModel);
     }
+
+    @Override
+    public void updateStatusProductAndPrice(Long rentalId, Long productId, BigDecimal price, RentalProductStatus status) {
+        Optional<RentalEntity>  rentalEntity =this.springDataJpaRental.findById(rentalId);
+        if (rentalEntity.isPresent()) {
+            RentalEntity gameInventoryEntity = rentalEntity.get();
+            Optional<RentalProductEntity> product = gameInventoryEntity.getRentalProducts().stream().filter(game -> game.getId().equals(productId)).findFirst();
+            if(product.isPresent()){
+                RentalProductEntity rentalProductEntity = product.get();
+                rentalProductEntity.updatePriceAndStatus(price,status);
+            }
+            this.springDataJpaRental.save(gameInventoryEntity);
+        }
+    }
+
 }
