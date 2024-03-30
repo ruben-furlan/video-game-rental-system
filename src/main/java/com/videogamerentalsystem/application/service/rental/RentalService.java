@@ -47,7 +47,7 @@ public class RentalService implements RentalUserCase {
 
         List<RentalProductModel> productModels = buildToModel.getProductModels();
 
-        List<GameInventoryModel> gameInventoryModels = this.gameInventoryService.stockExists(productModels);
+        List<GameInventoryModel> gameInventoryModels = this.gameInventoryService.stockExists(this.getTitles(productModels));
 
         this.rentalPaymentCalculationService.applyAndCalculateRentalCost(buildToModel, gameInventoryModels);
 
@@ -60,6 +60,10 @@ public class RentalService implements RentalUserCase {
         this.gameInventoryService.stockRemove(gameInventoryModels);
 
         return rentalModel;
+    }
+
+    private  List<String> getTitles(List<RentalProductModel> productModels) {
+        return productModels.stream().map(RentalProductModel::getTitle).collect(Collectors.toList());
     }
 
 

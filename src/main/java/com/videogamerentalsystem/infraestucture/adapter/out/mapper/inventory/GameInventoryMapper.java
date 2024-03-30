@@ -39,6 +39,10 @@ public class GameInventoryMapper {
                 .build();
     }
 
+    public List<GameInventoryModel> toModelGameInventories(List<GameInventoryEntity> gameInventoryEntity) {
+        return gameInventoryEntity.stream().map(this::toModelGameInventory).collect(Collectors.toList());
+    }
+
     public GameInventoryModel toModelGameInventory(GameInventoryEntity gameInventoryEntity) {
         return GameInventoryModel.builder()
                 .id(gameInventoryEntity.getId())

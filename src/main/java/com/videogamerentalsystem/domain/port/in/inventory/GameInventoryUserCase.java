@@ -43,7 +43,7 @@ public interface GameInventoryUserCase {
      * @param productModels The set of rental product models to check stock for.
      * @return A list of game inventory models representing the available stock.
      */
-    List<GameInventoryModel> stockExists(List<RentalProductModel> productModels);
+    List<GameInventoryModel> stockExists(List<String> titles);
 
     /**
      * Removes stock from the game inventory for the provided set of game inventory models.
