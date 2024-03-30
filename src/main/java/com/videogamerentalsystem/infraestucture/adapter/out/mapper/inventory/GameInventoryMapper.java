@@ -4,7 +4,6 @@ import com.videogamerentalsystem.domain.model.inventory.GameInventoryModel;
 import com.videogamerentalsystem.domain.model.inventory.GameInventoryPriceModel;
 import com.videogamerentalsystem.infraestucture.adapter.out.entity.inventory.GameInventoryEntity;
 import com.videogamerentalsystem.infraestucture.adapter.out.entity.inventory.GameInventoryPriceEntity;
-
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;

@@ -36,8 +36,8 @@ public class GameInventoryPersistenceAdapter implements GameInventoryRepositoryP
     }
 
     @Override
-    public Set<GameInventoryEntity> findByIDs(List<Long> ids) {
-        return this.springDataJpaGameInventory.findAllByIdIn(ids);
+    public Optional<GameInventoryModel> findByProductId(Long productId) {
+        return this.springDataJpaGameInventory.findFirstByInventoryPriceEntityId(productId).map(this.gameInventoryMapper::toModelGameInventory);
     }
 
     @Override

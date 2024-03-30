@@ -1,6 +1,7 @@
 package com.videogamerentalsystem.infraestucture.adapter.out.entity.rental;
 
 import com.videogamerentalsystem.domain.model.inventory.constant.GameType;
+import com.videogamerentalsystem.domain.model.rental.constant.RentalProductStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -37,11 +38,16 @@ public class RentalProductEntity {
     @Column(name = "VERSION")
     private Long version;
 
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "STATUS")
+    private RentalProductStatus status;
+
     @Column(name = "TITLE")
     private String title;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type")
+    @Column(name = "TYPE")
     private GameType type;
 
     @Column(name = "END_DATE")
@@ -56,5 +62,10 @@ public class RentalProductEntity {
 
     public void addJoin(RentalEntity rentalEntity) {
         this.rental = rentalEntity;
+    }
+
+    public void updatePriceAndStatus(BigDecimal price,RentalProductStatus status){
+        this.price=price;
+        this.status=status;
     }
 }

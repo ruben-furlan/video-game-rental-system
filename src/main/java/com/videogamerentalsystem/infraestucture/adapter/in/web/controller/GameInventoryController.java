@@ -26,8 +26,7 @@ public class GameInventoryController {
 
     @PostMapping()
     public ResponseEntity<ResponseInventoryDTO> create(@Valid @RequestBody GameInventoryCommand gameInventoryCommand) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(this.gameInventoryResponseApiMapper.toResponseApi(this.gameInventoryUserCase.create(gameInventoryCommand)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.gameInventoryResponseApiMapper.toResponseApi(this.gameInventoryUserCase.create(gameInventoryCommand)));
     }
     @GetMapping("/{inventoryId}")
     public ResponseEntity<ResponseInventoryDTO> findInventoryById (@PathVariable Long inventoryId) {

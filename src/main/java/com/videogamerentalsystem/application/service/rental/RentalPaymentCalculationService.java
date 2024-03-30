@@ -7,6 +7,8 @@ import com.videogamerentalsystem.domain.model.inventory.constant.GameType;
 import com.videogamerentalsystem.domain.model.rental.RentalModel;
 import com.videogamerentalsystem.domain.model.rental.RentalProductChargeModel;
 import com.videogamerentalsystem.domain.model.rental.RentalProductModel;
+import com.videogamerentalsystem.domain.model.rental.RentalProductSurchargeModel;
+import com.videogamerentalsystem.domain.model.rental.constant.RentalProductStatus;
 import com.videogamerentalsystem.domain.port.in.rental.RentalPaymentCalculationUserCase;
 import com.videogamerentalsystem.infraestucture.exception.custom.ApiException;
 import com.videogamerentalsystem.infraestucture.exception.custom.ApiExceptionConstantsMessagesError;
@@ -26,27 +28,65 @@ import org.springframework.util.CollectionUtils;
 @Transactional(propagation = Propagation.REQUIRED)
 public class RentalPaymentCalculationService implements RentalPaymentCalculationUserCase {
 
+    public static final String EXTRAS_DAYS = "EXTRAS_DAYS";
+
     @Override
-    public void calculateAndSetRentalCost(RentalModel rentalModel, Set<GameInventoryModel> gameInventoryModels) {
-        if (Objects.isNull(rentalModel)|| CollectionUtils.isEmpty(rentalModel.getProductModels())) {
+    public void applyAndCalculateRentalCost(RentalModel rentalModel, Set<GameInventoryModel> gameInventoryModels) {
+        if (Objects.isNull(rentalModel) || CollectionUtils.isEmpty(rentalModel.getProductModels())) {
             throw new ApiException(ApiExceptionConstantsMessagesError.MESSAGE_GENERIC, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         rentalModel.getProductModels().forEach(productModel -> this.applyCostConditions(rentalModel, gameInventoryModels, productModel));
     }
 
-    private void applyCostConditions (RentalModel rentalModel, Set<GameInventoryModel> gameInventoryModels, RentalProductModel productModel) {
+
+    @Override
+    public void applySurchargeForProduct(RentalProductModel productModel) {
+        if (Objects.isNull(productModel)) {
+            throw new ApiException(ApiExceptionConstantsMessagesError.MESSAGE_GENERIC, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        Integer numberDays = this.calculateNumberDays(productModel, LocalDateTime.now());
+        if (numberDays < 0) {
+            numberDays = Math.abs(numberDays);
+            RentalProductChargeModel charges = productModel.getCharges();
+            BigDecimal price = charges.getPrice();
+            BigDecimal subTotal = BigDecimal.ZERO;
+            BigDecimal total;
+
+            if(numberDays==1){
+                total =price.add(price);
+            }else{
+                BigDecimal priceWithOutPromo = this.getPriceWithOutPromo(numberDays, price);
+                subTotal = priceWithOutPromo.subtract(price);
+                total = this.getPriceWithOutPromo(numberDays, price);
+            }
+            RentalProductSurchargeModel productSurchargeModel = RentalProductSurchargeModel.builder()
+                    .amount(subTotal)
+                    .reason(EXTRAS_DAYS)
+                    .build();
+
+            productModel.getCharges().updateTotalAndPrice(total, price);
+
+            charges.addSurchargeModel(productSurchargeModel);
+        }
+    }
+
+    private void applyCostConditions(RentalModel rentalModel, Set<GameInventoryModel> gameInventoryModels, RentalProductModel productModel) {
         GameInventoryModel gameInventoryModel = this.findGameInventoryModel(gameInventoryModels, productModel);
+        if (Objects.nonNull(gameInventoryModel)) {
+            productModel.updateStatus(RentalProductStatus.IN_PROGRESS);
 
-        productModel.setType(gameInventoryModel.getType());
-        Integer numberDays = this.calculateNumberDays(productModel, rentalModel.getDate());
+            productModel.updateType(gameInventoryModel.getType());
+            Integer numberDays = this.calculateNumberDays(productModel, rentalModel.getDate());
 
-        BigDecimal gameInventoryPriceAmount = gameInventoryModel.getInventoryPriceModel().getAmount();
+            BigDecimal gameInventoryPriceAmount = gameInventoryModel.getInventoryPriceModel().getAmount();
 
-        BigDecimal rentalProductCharge = this.getChargeToApplyByGameType(numberDays, gameInventoryModel.getType(), gameInventoryPriceAmount);
+            BigDecimal rentalProductCharge = this.getChargeToApplyByGameType(numberDays, gameInventoryModel.getType(), gameInventoryPriceAmount);
 
-        productModel.setCharges(RentalProductChargeModel.builder().price(rentalProductCharge).build());
+            productModel.updateCharges(RentalProductChargeModel.builder().price(rentalProductCharge).build());
 
-        productModel.setNumberDays(numberDays);
+            productModel.updateNumberDays(numberDays);
+
+        }
     }
 
     private GameInventoryModel findGameInventoryModel(Set<GameInventoryModel> gameInventoryModels, RentalProductModel productModel) {
@@ -82,5 +122,6 @@ public class RentalPaymentCalculationService implements RentalPaymentCalculation
         }
         return Math.toIntExact(dayDiff);
     }
+
 
 }
