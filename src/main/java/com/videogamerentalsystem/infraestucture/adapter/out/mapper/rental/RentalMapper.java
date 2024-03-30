@@ -7,8 +7,8 @@ import com.videogamerentalsystem.domain.model.rental.RentalProductModel;
 import com.videogamerentalsystem.infraestucture.adapter.out.entity.rental.RentalCustomerEntity;
 import com.videogamerentalsystem.infraestucture.adapter.out.entity.rental.RentalEntity;
 import com.videogamerentalsystem.infraestucture.adapter.out.entity.rental.RentalProductEntity;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -19,7 +19,7 @@ public class RentalMapper {
     public RentalEntity toRentalEntity(RentalModel rentalModel) {
         RentalEntity.RentalEntityBuilder rentalEntityBuilder = RentalEntity.builder();
         RentalCustomerEntity rentalCustomerEntity = this.toRentalCustomerEntity(rentalModel.getCustomerModel());
-        Set<RentalProductEntity> rentalProductEntities = this.toRentalProductsEntity(rentalModel.getProductModels());
+        List<RentalProductEntity> rentalProductEntities = this.toRentalProductsEntity(rentalModel.getProductModels());
         RentalEntity rentalEntity = rentalEntityBuilder.date(rentalModel.getDate())
                 .currency(rentalModel.getCurrency())
                 .paymentType(rentalModel.getPaymentType())
@@ -41,17 +41,17 @@ public class RentalMapper {
                 .build();
     }
 
-    private void joinRelationship(RentalCustomerEntity customer, Set<RentalProductEntity> rentalProducts, RentalEntity rentalEntity) {
+    private void joinRelationship(RentalCustomerEntity customer, List<RentalProductEntity> rentalProducts, RentalEntity rentalEntity) {
         customer.addJoin(rentalEntity);
         this.jointProductEntityToRental(rentalProducts, rentalEntity);
     }
 
 
-    private Set<RentalProductEntity> toRentalProductsEntity(Set<RentalProductModel> rentalProductModels) {
+    private List<RentalProductEntity> toRentalProductsEntity(List<RentalProductModel> rentalProductModels) {
         return CollectionUtils.isEmpty(rentalProductModels) ? null : rentalProductModels
                 .stream()
                 .map(this::toRentalProductEntity)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     private RentalProductEntity toRentalProductEntity(RentalProductModel rentalProductModel) {
@@ -88,11 +88,11 @@ public class RentalMapper {
                 .build();
     }
 
-    private Set<RentalProductModel> toRentalProductsModel(Set<RentalProductEntity> rentalProductEntities) {
+    private List<RentalProductModel> toRentalProductsModel(List<RentalProductEntity> rentalProductEntities) {
         return CollectionUtils.isEmpty(rentalProductEntities) ? null : rentalProductEntities
                 .stream()
                 .map(this::toRentalProductModel)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     public RentalProductModel toRentalProductModel(RentalProductEntity rentalProductEntity) {
@@ -107,7 +107,7 @@ public class RentalMapper {
     }
 
 
-    private void jointProductEntityToRental(Set<RentalProductEntity> rentalProducts, RentalEntity rentalEntity) {
+    private void jointProductEntityToRental(List<RentalProductEntity> rentalProducts, RentalEntity rentalEntity) {
         if (CollectionUtils.isEmpty(rentalProducts) == Boolean.FALSE) {
             rentalProducts.forEach(rentalProduct -> rentalProduct.addJoin(rentalEntity));
         }

@@ -35,8 +35,8 @@ public class RentalController {
     }
 
     @PutMapping("/{rentalId}/hand-back/game")
-    public ResponseEntity<ResponseRentalDTO> handBackGame(@PathVariable(value = "rentalId") Long rentalId, @RequestParam(value = "rentalProductId") Long rentalProductId) {
-        return ResponseEntity.status(HttpStatus.OK).body(this.rentalResponseApiMapper.toResponseApi(this.rentalUserCase.handBackGame(rentalId, rentalProductId)));
+    public ResponseEntity<ResponseRentalDTO> handBackGame(@PathVariable(value = "rentalId") Long rentalId, @RequestParam(value = "product_id") Long productId) {
+        return ResponseEntity.status(HttpStatus.OK).body(this.rentalResponseApiMapper.toResponseApi(this.rentalUserCase.handBackGame(rentalId, productId)));
     }
 
 }

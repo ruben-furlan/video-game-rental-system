@@ -2,7 +2,7 @@ package com.videogamerentalsystem.infraestucture.adapter.out.dto.rental;
 
 import com.videogamerentalsystem.domain.model.rental.constant.RentalPaymentType;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,5 +14,5 @@ public class ResponseRentalDTO {
     private String currency;
     private RentalPaymentType paymentType;
     private ResponseRentalCustomerDTO customer;
-    private Set<ResponseProductDTO> products;;
+    private List<ResponseProductDTO> products;;
 }
