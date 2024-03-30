@@ -65,9 +65,13 @@ public class RentalService implements RentalUserCase {
 
     @Override
     public RentalModel  handBackGame(Long rentalId,  Long rentalProductId) {
-        RentalModel rentalModel = this.rentalRepositoryPort.findRentalById(rentalId).orElseThrow(() -> new ApiException(ApiExceptionConstantsMessagesError.RENTAL_NOT_FOUND, HttpStatus.NOT_FOUND));
+        RentalModel rentalModel = this.rentalRepositoryPort.findRentalById(rentalId).orElseThrow(() -> new ApiException(ApiExceptionConstantsMessagesError.RENTAL_ID_NOT_FOUND.formatted(rentalId), HttpStatus.NOT_FOUND));
 
         RentalProductModel productModel = this.fidRentalProductModel(rentalProductId, rentalModel);
+
+        if(productModel.getStatus().isFinish()){
+            throw new ApiException("The product  %d finished, please check the rent: %d".formatted(rentalProductId, rentalId), HttpStatus.BAD_REQUEST);
+        }
 
         GameInventoryModel inventoryModel = this.gameInventoryService.findInventoryByTitle(productModel.getTitle()).orElseThrow(() -> new ApiException(ApiExceptionConstantsMessagesError.PRODUCT_TITLE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
@@ -91,7 +95,7 @@ public class RentalService implements RentalUserCase {
 
     @Override
     public RentalModel get(Long rentalId) {
-       return  this.rentalRepositoryPort.findRentalById(rentalId).orElseThrow(() -> new ApiException(ApiExceptionConstantsMessagesError.RENTAL_NOT_FOUND, HttpStatus.NOT_FOUND));
+       return  this.rentalRepositoryPort.findRentalById(rentalId).orElseThrow(() -> new ApiException(ApiExceptionConstantsMessagesError.RENTAL_ID_NOT_FOUND.formatted(rentalId), HttpStatus.NOT_FOUND));
     }
 
     private RentalModel buildToModelAndValidate(RentalCommand rentalCommand) {

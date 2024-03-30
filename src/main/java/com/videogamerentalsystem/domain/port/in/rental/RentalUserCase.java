@@ -30,5 +30,5 @@ public interface RentalUserCase {
      * @param rentalProductId The ID of the rentalProductId being returned.
      * @return The updated rental model after the game return.
      */
-    RentalModel handBackGame(Long rentalId, Long rentalProductId);
+    RentalModel handBackGame(Long rentalId, Long productId);
 }
