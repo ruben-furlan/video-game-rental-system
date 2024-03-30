@@ -6,8 +6,9 @@ import com.videogamerentalsystem.domain.model.rental.RentalProductModel;
 import com.videogamerentalsystem.domain.model.rental.constant.RentalLoyalty;
 import com.videogamerentalsystem.domain.port.in.rental.RentalLoyaltyUserCase;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
 
 @UseCase
 public class RentalLoyaltyService implements RentalLoyaltyUserCase {
@@ -19,7 +20,7 @@ public class RentalLoyaltyService implements RentalLoyaltyUserCase {
         POINTS_PER_TYPE.put(GameType.CLASSIC, RentalLoyalty.CLASSIC_POINT);
     }
 
-    public Integer calculateTotalPoints(Set<RentalProductModel> productModels) {
+    public Integer calculateTotalPoints(List<RentalProductModel> productModels) {
         return productModels.stream()
                 .mapToInt(product -> POINTS_PER_TYPE.getOrDefault(product.getType(), RentalLoyalty.CLASSIC_POINT).getValue())
                 .sum();

@@ -17,7 +17,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -54,6 +54,6 @@ public class RentalEntity {
     private RentalCustomerEntity customer;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "rental", cascade = CascadeType.ALL)
-    public Set<RentalProductEntity> rentalProducts;
+    public List<RentalProductEntity> rentalProducts;
 
 }

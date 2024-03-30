@@ -4,10 +4,11 @@ import com.videogamerentalsystem.domain.model.rental.constant.RentalPaymentType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.util.Set;
+import java.util.List;
+
 
 public record RentalCommand(
                            @NotBlank String currency,
                            @NotNull RentalPaymentType paymentType,
                            @Valid  @NotNull RentalCustomerCommand customer,
-                           @Valid @NotNull Set<RentalProductCommand> products) {}
+                           @Valid @NotNull List<RentalProductCommand> products) {}

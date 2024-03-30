@@ -3,8 +3,9 @@ package com.videogamerentalsystem.domain.port.in.inventory;
 import com.videogamerentalsystem.domain.model.inventory.GameInventoryModel;
 import com.videogamerentalsystem.domain.model.rental.RentalProductModel;
 import com.videogamerentalsystem.domain.port.in.inventory.commad.GameInventoryCommand;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+
 
 /**
  * Interface for the game inventory use case.
@@ -27,33 +28,34 @@ public interface GameInventoryUserCase {
      */
     Optional<GameInventoryModel> findInventoryById(Long id);
 
+
     /**
-     * Finds the game inventory by its associated product identifier.
+     * Finds a game inventory by its title.
      *
-     * @param productId The identifier of the associated product.
-     * @return An optional containing the game inventory model if found, otherwise empty.
+     * @param title The title of the game inventory to find.
+     * @return An Optional containing the game inventory if found, or empty if not found.
      */
-    Optional<GameInventoryModel> findInventoryByProductId(Long productId);
+    Optional<GameInventoryModel> findInventoryByTitle(String title);
 
     /**
      * Checks if the stock exists for the provided set of rental product models.
      *
      * @param productModels The set of rental product models to check stock for.
-     * @return A set of game inventory models representing the available stock.
+     * @return A list of game inventory models representing the available stock.
      */
-    Set<GameInventoryModel> stockExists(Set<RentalProductModel> productModels);
+    List<GameInventoryModel> stockExists(List<String> titles);
 
     /**
      * Removes stock from the game inventory for the provided set of game inventory models.
      *
-     * @param gameInventoryModels The set of game inventory models for which to remove stock.
+     * @param gameInventoryModels The List of game inventory models for which to remove stock.
      */
-    void stockRemove(Set<GameInventoryModel> gameInventoryModels);
+    void stockRemove(List<GameInventoryModel> gameInventoryModels);
 
     /**
-     * Adds stock to the game inventory for the provided set of game inventory models.
+     * Add stock to the game inventory for the provided set of game inventory model.
      *
-     * @param gameInventoryModels The set of game inventory models for which to add stock.
+     * @param gameInventoryModel game inventory models for which to add stock.
      */
-    void stockAdd(Set<GameInventoryModel> gameInventoryModels);
+    void stockAdd(GameInventoryModel gameInventoryModels);
 }

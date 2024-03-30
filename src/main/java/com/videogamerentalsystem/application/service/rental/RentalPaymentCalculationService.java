@@ -15,8 +15,9 @@ import com.videogamerentalsystem.infraestucture.exception.custom.ApiExceptionCon
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Propagation;
@@ -31,7 +32,7 @@ public class RentalPaymentCalculationService implements RentalPaymentCalculation
     public static final String EXTRAS_DAYS = "EXTRAS_DAYS";
 
     @Override
-    public void applyAndCalculateRentalCost(RentalModel rentalModel, Set<GameInventoryModel> gameInventoryModels) {
+    public void applyAndCalculateRentalCost(RentalModel rentalModel, List<GameInventoryModel> gameInventoryModels) {
         if (Objects.isNull(rentalModel) || CollectionUtils.isEmpty(rentalModel.getProductModels())) {
             throw new ApiException(ApiExceptionConstantsMessagesError.MESSAGE_GENERIC, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -70,7 +71,7 @@ public class RentalPaymentCalculationService implements RentalPaymentCalculation
         }
     }
 
-    private void applyCostConditions(RentalModel rentalModel, Set<GameInventoryModel> gameInventoryModels, RentalProductModel productModel) {
+    private void applyCostConditions(RentalModel rentalModel, List<GameInventoryModel> gameInventoryModels, RentalProductModel productModel) {
         GameInventoryModel gameInventoryModel = this.findGameInventoryModel(gameInventoryModels, productModel);
         if (Objects.nonNull(gameInventoryModel)) {
             productModel.updateStatus(RentalProductStatus.IN_PROGRESS);
@@ -89,7 +90,7 @@ public class RentalPaymentCalculationService implements RentalPaymentCalculation
         }
     }
 
-    private GameInventoryModel findGameInventoryModel(Set<GameInventoryModel> gameInventoryModels, RentalProductModel productModel) {
+    private GameInventoryModel findGameInventoryModel(List<GameInventoryModel> gameInventoryModels, RentalProductModel productModel) {
         return gameInventoryModels.stream().filter(game -> game.getTitle().equals(productModel.getTitle())).findFirst().orElse(null);
     }
 

@@ -27,7 +27,7 @@ public interface RentalUserCase {
      * Handles the return of a game associated with a rental.
      *
      * @param rentalId The ID of the rental.
-     * @param productId The ID of the product/game being returned.
+     * @param rentalProductId The ID of the rentalProductId being returned.
      * @return The updated rental model after the game return.
      */
     RentalModel handBackGame(Long rentalId, Long productId);

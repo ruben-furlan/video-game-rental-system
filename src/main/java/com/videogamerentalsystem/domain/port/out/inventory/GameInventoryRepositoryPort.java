@@ -1,6 +1,7 @@
 package com.videogamerentalsystem.domain.port.out.inventory;
 
 import com.videogamerentalsystem.domain.model.inventory.GameInventoryModel;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -25,12 +26,13 @@ public interface GameInventoryRepositoryPort {
     Optional<GameInventoryModel> findByID(Long id);
 
     /**
-     * Finds the game inventory by its associated product identifier.
+     * Finds the game inventory by its title.
      *
-     * @param productId The identifier of the associated product.
+     * @param title The title of the game inventory to find.
      * @return An optional containing the game inventory model if found, otherwise empty.
      */
-    Optional<GameInventoryModel> findByProductId(Long productId);
+    Optional<GameInventoryModel> findByTitle(String title);
+
 
     /**
      * Finds the game inventory by its title.
@@ -38,7 +40,8 @@ public interface GameInventoryRepositoryPort {
      * @param title The title of the game inventory to find.
      * @return An optional containing the game inventory model if found, otherwise empty.
      */
-    Optional<GameInventoryModel> findByTitle(String title);
+    List<GameInventoryModel> findByTitles(List<String> title);
+
 
     /**
      * Updates the stock quantity for the specified game inventory.
@@ -48,10 +51,4 @@ public interface GameInventoryRepositoryPort {
      */
     void updateStock(Long id, Integer stock);
 
-    /**
-     * Adds stock to the specified game inventory.
-     *
-     * @param id The identifier of the game inventory.
-     */
-    void addStock(Long id);
 }
