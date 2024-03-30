@@ -44,7 +44,6 @@ public class RentalPaymentCalculationService implements RentalPaymentCalculation
             throw new ApiException(ApiExceptionConstantsMessagesError.MESSAGE_GENERIC, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         Integer numberDays = this.calculateNumberDays(productModel, LocalDateTime.now());
-
         if (this.isDelayed(numberDays)) {
             numberDays = Math.abs(numberDays);
             RentalProductChargeModel charges = productModel.getCharges();
@@ -61,16 +60,11 @@ public class RentalPaymentCalculationService implements RentalPaymentCalculation
         GameInventoryModel gameInventoryModel = this.findGameInventoryModel(gameInventoryModels, productModel);
         if (Objects.nonNull(gameInventoryModel)) {
             productModel.updateStatus(RentalProductStatus.IN_PROGRESS);
-
             productModel.updateType(gameInventoryModel.getType());
             Integer numberDays = this.calculateNumberDays(productModel, rentalModel.getDate());
-
             BigDecimal gameInventoryPriceAmount = gameInventoryModel.getInventoryPriceModel().getAmount();
-
             BigDecimal rentalProductCharge = this.getChargeToApplyByGameType(numberDays, gameInventoryModel.getType(), gameInventoryPriceAmount);
-
             productModel.updateCharges(RentalProductChargeModel.builder().price(rentalProductCharge).build());
-
             productModel.updateNumberDays(numberDays);
 
         }
