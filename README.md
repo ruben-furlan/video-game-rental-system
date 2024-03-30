@@ -104,7 +104,7 @@ curl --location 'http://localhost:8080/v1/video-game-rental-system/inventory' \
 curl --location 'http://localhost:8080/v1/video-game-rental-system/inventory' \
 --header 'Content-Type: application/json' \
 --data '{
-    "title": "No Man’s Sky",
+    "title": "No Mans Sky",
     "type": "NEW_RELEASE",
     "stock": 10,
     "price": {
@@ -154,7 +154,7 @@ curl --location 'http://localhost:8080/v1/video-game-rental-system/rental' \
     },
     "products": [
         {
-            "title": "No Man’s Sky",
+            "title": "No Mans Sky",
             "end_date": "2024-03-29T22:00:00"
         },
         {
