@@ -5,23 +5,27 @@ import com.videogamerentalsystem.common.UseCase;
 import com.videogamerentalsystem.domain.model.inventory.GameInventoryModel;
 import com.videogamerentalsystem.domain.model.rental.RentalCustomerModel;
 import com.videogamerentalsystem.domain.model.rental.RentalModel;
+import com.videogamerentalsystem.domain.model.rental.RentalProductChargeModel;
 import com.videogamerentalsystem.domain.model.rental.RentalProductModel;
+import com.videogamerentalsystem.domain.model.rental.constant.RentalProductStatus;
 import com.videogamerentalsystem.domain.port.in.rental.RentalUserCase;
 import com.videogamerentalsystem.domain.port.in.rental.command.RentalCommand;
 import com.videogamerentalsystem.domain.port.in.rental.command.RentalCustomerCommand;
 import com.videogamerentalsystem.domain.port.in.rental.command.RentalProductCommand;
 import com.videogamerentalsystem.domain.port.out.rental.RentalRepositoryPort;
 import com.videogamerentalsystem.infraestucture.exception.custom.ApiException;
+import com.videogamerentalsystem.infraestucture.exception.custom.ApiExceptionConstantsMessagesError;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 
 @UseCase
@@ -46,14 +50,13 @@ public class RentalService implements RentalUserCase {
 
         Set<GameInventoryModel> gameInventoryModels = this.gameInventoryService.stockExists(productModels);
 
-        this.rentalPaymentCalculationService.calculateAndSetRentalCost(buildToModel, gameInventoryModels);
+        this.rentalPaymentCalculationService.applyAndCalculateRentalCost(buildToModel, gameInventoryModels);
 
         Integer loyaltyPoints = this.rentalLoyaltyService.calculateTotalPoints(productModels);
 
         buildToModel.getCustomerModel().addLoyaltyPoints(loyaltyPoints);
 
         RentalModel rentalModel = this.rentalRepositoryPort.create(buildToModel);
-
 
         this.gameInventoryService.stockRemove(gameInventoryModels);
 
@@ -62,8 +65,34 @@ public class RentalService implements RentalUserCase {
 
 
     @Override
-    public RentalProductModel findGameByTitleAndRentalId(String title, Long rentalId) {
-        return null;
+    public RentalModel  handBackGame(Long rentalId,  Long productId) {
+        RentalModel rentalModel = this.rentalRepositoryPort.findRentalById(rentalId).orElseThrow(() -> new ApiException(ApiExceptionConstantsMessagesError.RENTAL_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        GameInventoryModel inventoryModel = this.gameInventoryService.findInventoryByProductId(productId).orElseThrow(() -> new ApiException(ApiExceptionConstantsMessagesError.PRODUCT_TITLE_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        RentalProductModel productModel = this.fidRentalProductModelByTitle(rentalModel, inventoryModel.getId());
+
+        this.rentalPaymentCalculationService.applySurchargeForProduct(productModel);
+
+        RentalProductChargeModel charges = productModel.getCharges();
+
+        this.rentalRepositoryPort.updateStatusProductAndPrice(rentalId, productModel.getId(), this.evaluateAndApplyIfPriceChangeOrKeepCurrent(charges.getTotal(), charges.getPrice()), RentalProductStatus.FINISH);
+
+        productModel.updateStatus(RentalProductStatus.FINISH);
+
+        return rentalModel;
+    }
+
+
+    @Override
+    public RentalModel get(Long rentalId) {
+       return  this.rentalRepositoryPort.findRentalById(rentalId).orElseThrow(() -> new ApiException(ApiExceptionConstantsMessagesError.RENTAL_NOT_FOUND, HttpStatus.NOT_FOUND));
+    }
+
+    private  RentalProductModel fidRentalProductModelByTitle(RentalModel rentalModel, Long productId) {
+        return rentalModel.getProductModels()
+                .stream().filter(productModel -> Objects.equals(productModel.getId(), productId)).findFirst()
+                .orElseThrow(() -> new ApiException(ApiExceptionConstantsMessagesError.MESSAGE_GENERIC, HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
 
@@ -94,7 +123,7 @@ public class RentalService implements RentalUserCase {
                 .build();
     }
 
-    private  void validateCommand(RentalCommand rentalCommand) {
+    private void validateCommand(RentalCommand rentalCommand) {
         Map<String, Long> titleCounts = rentalCommand.products().stream()
                 .collect(Collectors.groupingBy(RentalProductCommand::title, Collectors.counting()));
         List<String> duplicateTitles = titleCounts.entrySet().stream()
@@ -102,9 +131,17 @@ public class RentalService implements RentalUserCase {
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
         if (!duplicateTitles.isEmpty()) {
-            String errorMessage = "Títulos duplicados encontrados: %s".formatted(duplicateTitles);
+            String errorMessage = "Duplicated titles found: %s".formatted(duplicateTitles);
             throw new ApiException(errorMessage, HttpStatus.BAD_REQUEST);
         }
+    }
+
+
+    private  BigDecimal evaluateAndApplyIfPriceChangeOrKeepCurrent(BigDecimal total, BigDecimal priceToUpate) {
+        if(Objects.nonNull(total) && total.compareTo(BigDecimal.ZERO)>0) {
+            priceToUpate = total;
+        }
+        return priceToUpate;
     }
 
 

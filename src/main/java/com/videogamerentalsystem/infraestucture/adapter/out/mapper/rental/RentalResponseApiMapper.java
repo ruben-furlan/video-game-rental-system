@@ -46,6 +46,7 @@ public class RentalResponseApiMapper {
         return ResponseProductDTO.builder()
                 .id(rentalProductModel.getId())
                 .title(rentalProductModel.getTitle())
+                .status(rentalProductModel.getStatus())
                 .type(rentalProductModel.getType())
                 .numberDays(rentalProductModel.getNumberDays())
                 .endDate(rentalProductModel.getEndDate())

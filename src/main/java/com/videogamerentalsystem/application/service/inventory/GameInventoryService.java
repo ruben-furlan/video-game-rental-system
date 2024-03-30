@@ -8,15 +8,11 @@ import com.videogamerentalsystem.domain.port.in.inventory.GameInventoryUserCase;
 import com.videogamerentalsystem.domain.port.in.inventory.commad.GameInventoryCommand;
 import com.videogamerentalsystem.domain.port.in.inventory.commad.GameInventoryPriceCommand;
 import com.videogamerentalsystem.domain.port.out.inventory.GameInventoryRepositoryPort;
-import com.videogamerentalsystem.infraestucture.adapter.out.entity.inventory.GameInventoryEntity;
 import com.videogamerentalsystem.infraestucture.exception.custom.ApiException;
 import com.videogamerentalsystem.infraestucture.exception.custom.ApiExceptionConstantsMessagesError;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -42,20 +38,19 @@ public class GameInventoryService implements GameInventoryUserCase {
     }
 
     @Override
-    public Optional<GameInventoryModel> findInventoryByTitle(String title) {
-        return this.gameInventoryRepositoryPort.findByTitle(title);
+    public Optional<GameInventoryModel> findInventoryByProductId(Long productId) {
+        return this.gameInventoryRepositoryPort.findByProductId(productId);
     }
+
 
     public Set<GameInventoryModel> stockExists(Set<RentalProductModel> productModels) {
         Set<GameInventoryModel> gameInventoryModels = this.findGameInventoryModelsByTitles(productModels);
         if (this.allMatchStock(gameInventoryModels)) {
             return gameInventoryModels;
         }
-        throw new ApiException("There is not enough stock available to create the rental. Please, review the inventory.", HttpStatus.BAD_REQUEST);
+        throw new ApiException(ApiExceptionConstantsMessagesError.NOT_STOCK, HttpStatus.BAD_REQUEST);
 
     }
-
-
 
     @Override
     public void stockRemove(Set<GameInventoryModel> gameInventoryModels) {
@@ -66,9 +61,10 @@ public class GameInventoryService implements GameInventoryUserCase {
     }
 
     @Override
-    public void stackAdd(Set<GameInventoryModel> gameInventoryModels) {
+    public void stockAdd(Set<GameInventoryModel> gameInventoryModels) {
 
     }
+
 
     private GameInventoryModel buildToModelAndValidate(GameInventoryCommand gameInventoryCommand) {
         String title = gameInventoryCommand.title();
