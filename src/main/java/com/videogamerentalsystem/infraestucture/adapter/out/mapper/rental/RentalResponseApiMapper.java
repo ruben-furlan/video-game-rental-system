@@ -10,8 +10,8 @@ import com.videogamerentalsystem.infraestucture.adapter.out.dto.rental.ResponseP
 import com.videogamerentalsystem.infraestucture.adapter.out.dto.rental.ResponseProductSurchargesDTO;
 import com.videogamerentalsystem.infraestucture.adapter.out.dto.rental.ResponseRentalCustomerDTO;
 import com.videogamerentalsystem.infraestucture.adapter.out.dto.rental.ResponseRentalDTO;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
@@ -38,8 +38,8 @@ public class RentalResponseApiMapper {
                 .build();
     }
 
-    private Set<ResponseProductDTO> toResponseProductsApi(Set<RentalProductModel> productModels) {
-        return productModels.stream().map(this::toResponseProductApi).collect(Collectors.toSet());
+    private List<ResponseProductDTO> toResponseProductsApi(List<RentalProductModel> productModels) {
+        return productModels.stream().map(this::toResponseProductApi).collect(Collectors.toList());
     }
 
     private ResponseProductDTO toResponseProductApi(RentalProductModel rentalProductModel) {

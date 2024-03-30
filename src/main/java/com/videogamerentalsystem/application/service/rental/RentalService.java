@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -46,9 +45,9 @@ public class RentalService implements RentalUserCase {
 
         RentalModel buildToModel = this.buildToModelAndValidate(rentalCommand);
 
-        Set<RentalProductModel> productModels = buildToModel.getProductModels();
+        List<RentalProductModel> productModels = buildToModel.getProductModels();
 
-        Set<GameInventoryModel> gameInventoryModels = this.gameInventoryService.stockExists(productModels);
+        List<GameInventoryModel> gameInventoryModels = this.gameInventoryService.stockExists(productModels);
 
         this.rentalPaymentCalculationService.applyAndCalculateRentalCost(buildToModel, gameInventoryModels);
 
@@ -99,13 +98,13 @@ public class RentalService implements RentalUserCase {
         this.validateCommand(rentalCommand);
         RentalCustomerCommand rentalCustomerCommand = rentalCommand.customer();
 
-        Set<RentalProductCommand> rentalProductCommands = rentalCommand.products();
+        List<RentalProductCommand> rentalProductCommands = rentalCommand.products();
 
-        Set<RentalProductModel> productModels = rentalProductCommands
+        List<RentalProductModel> productModels = rentalProductCommands
                 .stream().map(rentalProductCommand -> RentalProductModel.builder()
                         .title(rentalProductCommand.title())
                         .endDate(rentalProductCommand.endDate())
-                        .build()).collect(Collectors.toSet());
+                        .build()).collect(Collectors.toList());
 
 
         RentalCustomerModel customerModel = RentalCustomerModel.builder()

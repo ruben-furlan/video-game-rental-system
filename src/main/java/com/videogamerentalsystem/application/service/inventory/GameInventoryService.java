@@ -10,9 +10,9 @@ import com.videogamerentalsystem.domain.port.in.inventory.commad.GameInventoryPr
 import com.videogamerentalsystem.domain.port.out.inventory.GameInventoryRepositoryPort;
 import com.videogamerentalsystem.infraestucture.exception.custom.ApiException;
 import com.videogamerentalsystem.infraestucture.exception.custom.ApiExceptionConstantsMessagesError;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -43,8 +43,8 @@ public class GameInventoryService implements GameInventoryUserCase {
     }
 
 
-    public Set<GameInventoryModel> stockExists(Set<RentalProductModel> productModels) {
-        Set<GameInventoryModel> gameInventoryModels = this.findGameInventoryModelsByTitles(productModels);
+    public List<GameInventoryModel> stockExists(List<RentalProductModel> productModels) {
+        List<GameInventoryModel> gameInventoryModels = this.findGameInventoryModelsByTitles(productModels);
         if (this.allMatchStock(gameInventoryModels)) {
             return gameInventoryModels;
         }
@@ -53,7 +53,7 @@ public class GameInventoryService implements GameInventoryUserCase {
     }
 
     @Override
-    public void stockRemove(Set<GameInventoryModel> gameInventoryModels) {
+    public void stockRemove(List<GameInventoryModel> gameInventoryModels) {
         gameInventoryModels.forEach(gameInventoryModelCurrent -> {
             Integer newStock = gameInventoryModelCurrent.getStock() - 1;
             this.gameInventoryRepositoryPort.updateStock(gameInventoryModelCurrent.getId(), newStock);
@@ -90,14 +90,14 @@ public class GameInventoryService implements GameInventoryUserCase {
                 .inventoryPriceModel(gameInventoryPriceModel).build();
     }
 
-    private boolean allMatchStock(Set<GameInventoryModel> gameInventoryModels) {
+    private boolean allMatchStock(List<GameInventoryModel> gameInventoryModels) {
         return !gameInventoryModels.isEmpty() && gameInventoryModels.stream().allMatch(game -> Objects.nonNull(game) && game.getStock() > 0);
     }
 
-    private Set<GameInventoryModel> findGameInventoryModelsByTitles(Set<RentalProductModel> productModels) {
+    private List<GameInventoryModel> findGameInventoryModelsByTitles(List<RentalProductModel> productModels) {
         return productModels.stream()
                 .map(productModel -> this.gameInventoryRepositoryPort.findByTitle(productModel.getTitle()).orElse(null))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
 

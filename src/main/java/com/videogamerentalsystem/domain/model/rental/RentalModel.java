@@ -2,7 +2,7 @@ package com.videogamerentalsystem.domain.model.rental;
 
 import com.videogamerentalsystem.domain.model.rental.constant.RentalPaymentType;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -18,5 +18,5 @@ public class RentalModel {
     private String currency;
     private RentalPaymentType paymentType;
     private RentalCustomerModel customerModel;
-    private Set<RentalProductModel> productModels;
+    private List<RentalProductModel> productModels;
 }
