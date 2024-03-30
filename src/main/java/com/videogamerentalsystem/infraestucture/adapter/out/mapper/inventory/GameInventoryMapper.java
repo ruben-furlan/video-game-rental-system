@@ -7,15 +7,10 @@ import com.videogamerentalsystem.infraestucture.adapter.out.entity.inventory.Gam
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 
 @Component
 public class GameInventoryMapper {
-
-    public List<GameInventoryEntity> toEntityGameInventories(List<GameInventoryModel> gameInventoryModel) {
-        return CollectionUtils.isEmpty(gameInventoryModel) ? null : gameInventoryModel.stream().map(this::toEntityGameInventory).collect(Collectors.toList());
-    }
 
     public GameInventoryEntity toEntityGameInventory(GameInventoryModel gameInventoryModel) {
         GameInventoryPriceEntity priceEntity = this.toEntityGameInventoryPrice(gameInventoryModel.getInventoryPriceModel());
