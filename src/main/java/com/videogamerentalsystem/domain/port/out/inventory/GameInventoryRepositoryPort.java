@@ -25,14 +25,6 @@ public interface GameInventoryRepositoryPort {
     Optional<GameInventoryModel> findByID(Long id);
 
     /**
-     * Finds the game inventory by its associated product identifier.
-     *
-     * @param productId The identifier of the associated product.
-     * @return An optional containing the game inventory model if found, otherwise empty.
-     */
-    Optional<GameInventoryModel> findByProductId(Long productId);
-
-    /**
      * Finds the game inventory by its title.
      *
      * @param title The title of the game inventory to find.
@@ -48,10 +40,4 @@ public interface GameInventoryRepositoryPort {
      */
     void updateStock(Long id, Integer stock);
 
-    /**
-     * Adds stock to the specified game inventory.
-     *
-     * @param id The identifier of the game inventory.
-     */
-    void addStock(Long id);
 }
