@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Propagation;
@@ -34,40 +33,26 @@ public class RentalPaymentCalculationService implements RentalPaymentCalculation
     @Override
     public void applyAndCalculateRentalCost(RentalModel rentalModel, List<GameInventoryModel> gameInventoryModels) {
         if (Objects.isNull(rentalModel) || CollectionUtils.isEmpty(rentalModel.getProductModels())) {
-            throw new ApiException(ApiExceptionConstantsMessagesError.MESSAGE_GENERIC, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ApiException(ApiExceptionConstantsMessagesError.Generic.MESSAGE_GENERIC, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         rentalModel.getProductModels().forEach(productModel -> this.applyCostConditions(rentalModel, gameInventoryModels, productModel));
     }
 
-
     @Override
     public void applySurchargeForProduct(RentalProductModel productModel) {
         if (Objects.isNull(productModel)) {
-            throw new ApiException(ApiExceptionConstantsMessagesError.MESSAGE_GENERIC, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ApiException(ApiExceptionConstantsMessagesError.Generic.MESSAGE_GENERIC, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         Integer numberDays = this.calculateNumberDays(productModel, LocalDateTime.now());
-        if (numberDays < 0) {
+        if (this.isDelayed(numberDays)) {
             numberDays = Math.abs(numberDays);
             RentalProductChargeModel charges = productModel.getCharges();
-            BigDecimal price = charges.getPrice();
-            BigDecimal subTotal = BigDecimal.ZERO;
-            BigDecimal total;
-
-            if(numberDays==1){
-                total =price.add(price);
-            }else{
-                BigDecimal priceWithOutPromo = this.getPriceWithOutPromo(numberDays, price);
-                subTotal = priceWithOutPromo.subtract(price);
-                total = this.getPriceWithOutPromo(numberDays, price);
-            }
-            RentalProductSurchargeModel productSurchargeModel = RentalProductSurchargeModel.builder()
-                    .amount(subTotal)
-                    .reason(EXTRAS_DAYS)
-                    .build();
-
-            productModel.getCharges().updateTotalAndPrice(total, price);
-
-            charges.addSurchargeModel(productSurchargeModel);
+            BigDecimal chargesPrice = charges.getPrice();
+            BigDecimal total = this.getTotal(numberDays, chargesPrice);
+            BigDecimal priceWithOutPromo = this.getPriceWithOutPromo(numberDays, chargesPrice);
+            BigDecimal subTotal = priceWithOutPromo.subtract(chargesPrice);
+            productModel.getCharges().updateTotalAndPrice(total, chargesPrice);
+            charges.addSurchargeModel(this.buildSurcharge(subTotal));
         }
     }
 
@@ -75,18 +60,12 @@ public class RentalPaymentCalculationService implements RentalPaymentCalculation
         GameInventoryModel gameInventoryModel = this.findGameInventoryModel(gameInventoryModels, productModel);
         if (Objects.nonNull(gameInventoryModel)) {
             productModel.updateStatus(RentalProductStatus.IN_PROGRESS);
-
             productModel.updateType(gameInventoryModel.getType());
             Integer numberDays = this.calculateNumberDays(productModel, rentalModel.getDate());
-
             BigDecimal gameInventoryPriceAmount = gameInventoryModel.getInventoryPriceModel().getAmount();
-
             BigDecimal rentalProductCharge = this.getChargeToApplyByGameType(numberDays, gameInventoryModel.getType(), gameInventoryPriceAmount);
-
             productModel.updateCharges(RentalProductChargeModel.builder().price(rentalProductCharge).build());
-
             productModel.updateNumberDays(numberDays);
-
         }
     }
 
@@ -118,10 +97,16 @@ public class RentalPaymentCalculationService implements RentalPaymentCalculation
 
     private Integer calculateNumberDays(RentalProductModel productModel, LocalDateTime date) {
         long dayDiff = ChronoUnit.DAYS.between(date.toLocalDate(), productModel.getEndDate().toLocalDate());
-        if (dayDiff == 0) {
-            return 1;
-        }
-        return Math.toIntExact(dayDiff);
+        return (dayDiff == 0) ? 1 : Math.toIntExact(dayDiff);
+    }
+    private RentalProductSurchargeModel buildSurcharge(BigDecimal subTotal) {
+        return RentalProductSurchargeModel.builder().amount(subTotal).reason(EXTRAS_DAYS).build();
+    }
+    private BigDecimal getTotal(Integer numberDays, BigDecimal price) {
+        return (numberDays == 1) ? price.add(price) : this.getPriceWithOutPromo(numberDays, price);
+    }
+    private boolean isDelayed(Integer numberDays) {
+        return numberDays < 0;
     }
 
 

@@ -6,12 +6,10 @@ import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
-import lombok.experimental.Accessors;
 
 @Getter
 @Builder
 @Data
-@Accessors(chain = true)
 public class RentalModel {
     private Long id;
     private LocalDateTime date;
