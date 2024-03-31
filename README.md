@@ -55,6 +55,11 @@ http://localhost:8080/h2-console
 > - AGREGAR JUEGOS AL INVENTARIO
 > - Te genera un ID unico que representa el id del juego en el inventario
 
+> [!IMPORTANT] 
+> Este script ya te ejecuta para tener stock de juegos : D (mismo que los curls de abajo)
+> [inventory.sh](https://github.com/ruben-furlan/video-game-rental-system/blob/master/src/main/resources/utils/inventory.sh)
+
+
 ```bash
 curl --location 'http://localhost:8080/v1/video-game-rental-system/inventory' \
 --header 'Content-Type: application/json' \
