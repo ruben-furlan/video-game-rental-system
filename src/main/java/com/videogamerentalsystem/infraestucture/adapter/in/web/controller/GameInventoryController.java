@@ -1,6 +1,7 @@
 package com.videogamerentalsystem.infraestucture.adapter.in.web.controller;
 
 
+import com.videogamerentalsystem.domain.model.inventory.GameInventoryModel;
 import com.videogamerentalsystem.domain.port.in.inventory.GameInventoryUserCase;
 import com.videogamerentalsystem.domain.port.in.inventory.commad.GameInventoryCommand;
 import com.videogamerentalsystem.infraestucture.adapter.out.dto.inventory.ResponseInventoryDTO;
@@ -26,7 +27,8 @@ public class GameInventoryController {
 
     @PostMapping()
     public ResponseEntity<ResponseInventoryDTO> create(@Valid @RequestBody GameInventoryCommand gameInventoryCommand) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.gameInventoryResponseApiMapper.toResponseApi(this.gameInventoryUserCase.create(gameInventoryCommand)));
+        GameInventoryModel createGame = this.gameInventoryUserCase.create(gameInventoryCommand);
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.gameInventoryResponseApiMapper.toResponseApi(createGame));
     }
     @GetMapping("/{inventoryId}")
     public ResponseEntity<ResponseInventoryDTO> findInventoryById (@PathVariable Long inventoryId) {

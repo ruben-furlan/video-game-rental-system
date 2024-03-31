@@ -1,9 +1,11 @@
 package com.videogamerentalsystem.application.service.rental;
 
-import com.videogamerentalsystem.application.service.inventory.GameInventoryService;
 import com.videogamerentalsystem.domain.model.inventory.GameInventoryModel;
 import com.videogamerentalsystem.domain.model.rental.RentalModel;
 import com.videogamerentalsystem.domain.model.rental.constant.RentalPaymentType;
+import com.videogamerentalsystem.domain.port.in.inventory.GameInventoryUserCase;
+import com.videogamerentalsystem.domain.port.in.rental.RentalLoyaltyUserCase;
+import com.videogamerentalsystem.domain.port.in.rental.RentalPaymentCalculationUserCase;
 import com.videogamerentalsystem.domain.port.in.rental.command.RentalCommand;
 import com.videogamerentalsystem.domain.port.out.rental.RentalRepositoryPort;
 import com.videogamerentalsystem.infraestucture.exception.custom.ApiException;
@@ -30,15 +32,19 @@ import org.springframework.http.HttpStatus;
 
 @ExtendWith(MockitoExtension.class)
 class RentalServiceTest {
-    @Mock
-    private RentalRepositoryPort rentalRepositoryPort;
-    @Mock
-    private GameInventoryService gameInventoryService;
-    @Mock
-    private  RentalPaymentCalculationService rentalPaymentCalculationService;
 
     @Mock
-    private RentalLoyaltyService loyaltyService;
+    private  RentalRepositoryPort rentalRepositoryPort;
+
+    @Mock
+    private  GameInventoryUserCase gameInventoryUserCase;
+
+    @Mock
+    private  RentalPaymentCalculationUserCase rentalPaymentCalculationUserCase;
+
+    @Mock
+    private  RentalLoyaltyUserCase rentalLoyaltyUserCase;
+
 
     @InjectMocks
     private RentalService rentalService;
@@ -56,7 +62,7 @@ class RentalServiceTest {
                 TestGameInventoryHelper.generateClassicGameInventoryModelDefault());
 
 
-        when(this.gameInventoryService.stockExists(anyList())).thenReturn(gameInventoryModels);
+        when(this.gameInventoryUserCase.stockExists(anyList())).thenReturn(gameInventoryModels);
         when(this.rentalRepositoryPort.create(any())).thenReturn(rentalModel);
 
         RentalModel createdRentalModel = this.rentalService.create(rentalCommand);
@@ -88,8 +94,8 @@ class RentalServiceTest {
     void case_0002_create_no_stock_available() {
         // Given
         RentalCommand rentalCommand = TestRentalHelper.generateRentalDefaultCommand();
-        when(this.gameInventoryService.stockExists(anyList()))
-                .thenThrow(new ApiException(ApiExceptionConstantsMessagesError.NOT_STOCK, HttpStatus.BAD_REQUEST));
+        when(this.gameInventoryUserCase.stockExists(anyList()))
+                .thenThrow(new ApiException(ApiExceptionConstantsMessagesError.GameInventory.NOT_STOCK, HttpStatus.BAD_REQUEST));
 
         // When & Then
         ApiException exception = assertThrows(ApiException.class, () -> rentalService.create(rentalCommand));
@@ -121,8 +127,8 @@ class RentalServiceTest {
 
         // Mocking
         when(this.rentalRepositoryPort.findRentalById(rentalId)).thenReturn(Optional.of(rentalModel));
-        when(this.gameInventoryService.findInventoryByTitle(any(String.class))).thenReturn(Optional.of(gameInventoryModel));
-        Mockito.doNothing().when(this.rentalPaymentCalculationService).applySurchargeForProduct(any());
+        when(this.gameInventoryUserCase.findInventoryByTitle(any(String.class))).thenReturn(Optional.of(gameInventoryModel));
+        Mockito.doNothing().when(this.rentalPaymentCalculationUserCase).applySurchargeForProduct(any());
 
         // When
         RentalModel result = this.rentalService.handBackGame(rentalId, rentalProductId);

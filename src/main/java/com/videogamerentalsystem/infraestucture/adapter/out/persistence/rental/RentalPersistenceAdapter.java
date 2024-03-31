@@ -35,16 +35,18 @@ public class RentalPersistenceAdapter implements RentalRepositoryPort {
 
     @Override
     public void updateStatusProductAndPrice(Long rentalId, Long productId, BigDecimal price, RentalProductStatus status) {
-        Optional<RentalEntity>  rentalEntity =this.springDataJpaRental.findById(rentalId);
-        if (rentalEntity.isPresent()) {
-            RentalEntity gameInventoryEntity = rentalEntity.get();
-            Optional<RentalProductEntity> product = gameInventoryEntity.getRentalProducts().stream().filter(game -> game.getId().equals(productId)).findFirst();
-            if(product.isPresent()){
-                RentalProductEntity rentalProductEntity = product.get();
-                rentalProductEntity.updatePriceAndStatus(price,status);
-            }
-            this.springDataJpaRental.save(gameInventoryEntity);
-        }
+        Optional<RentalEntity> rentalEntity = this.springDataJpaRental.findById(rentalId);
+        rentalEntity.ifPresent(rental -> {
+            this.finRentalProductById(productId, rental).ifPresent(rentalProduct -> rentalProduct.updatePriceAndStatus(price, status));
+            this.springDataJpaRental.save(rental);
+        });
+    }
+
+    private Optional<RentalProductEntity> finRentalProductById(Long productId, RentalEntity rental) {
+        return rental.getRentalProducts()
+                .stream()
+                .filter(game -> game.getId().equals(productId))
+                .findFirst();
     }
 
 }

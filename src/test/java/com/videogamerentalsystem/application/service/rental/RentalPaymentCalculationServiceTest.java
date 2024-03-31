@@ -58,7 +58,7 @@ public class RentalPaymentCalculationServiceTest {
 
         // Act and Assert
         ApiException exception = assertThrows(ApiException.class, () -> this.rentalPaymentCalculationService.applyAndCalculateRentalCost(rentalModel, gameInventoryModels));
-        assertEquals(ApiExceptionConstantsMessagesError.MESSAGE_GENERIC, exception.getMessage());
+        assertEquals(ApiExceptionConstantsMessagesError.Generic.MESSAGE_GENERIC, exception.getMessage());
     }
 
     @Test

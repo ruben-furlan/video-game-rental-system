@@ -1,5 +1,6 @@
 package com.videogamerentalsystem.infraestucture.adapter.in.web.controller;
 
+import com.videogamerentalsystem.domain.model.rental.RentalModel;
 import com.videogamerentalsystem.domain.port.in.rental.RentalUserCase;
 import com.videogamerentalsystem.domain.port.in.rental.command.RentalCommand;
 import com.videogamerentalsystem.infraestucture.adapter.out.dto.rental.ResponseRentalDTO;
@@ -26,17 +27,20 @@ public class RentalController {
 
     @PostMapping()
     public ResponseEntity<ResponseRentalDTO> create(@Valid @RequestBody RentalCommand rentalCommand) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.rentalResponseApiMapper.toResponseApi(this.rentalUserCase.create(rentalCommand)));
+        RentalModel crateRental = this.rentalUserCase.create(rentalCommand);
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.rentalResponseApiMapper.toResponseApi(crateRental));
     }
 
     @GetMapping("/{rentalId}")
     public ResponseEntity<ResponseRentalDTO> get(@PathVariable(value = "rentalId") Long rentalId) {
-        return ResponseEntity.status(HttpStatus.OK).body(this.rentalResponseApiMapper.toResponseApi(this.rentalUserCase.get(rentalId)));
+        RentalModel rental = this.rentalUserCase.get(rentalId);
+        return ResponseEntity.status(HttpStatus.OK).body(this.rentalResponseApiMapper.toResponseApi(rental));
     }
 
     @PutMapping("/{rentalId}/hand-back/game")
     public ResponseEntity<ResponseRentalDTO> handBackGame(@PathVariable(value = "rentalId") Long rentalId, @RequestParam(value = "product_id") Long productId) {
-        return ResponseEntity.status(HttpStatus.OK).body(this.rentalResponseApiMapper.toResponseApi(this.rentalUserCase.handBackGame(rentalId, productId)));
+        RentalModel handBackGame = this.rentalUserCase.handBackGame(rentalId, productId);
+        return ResponseEntity.status(HttpStatus.OK).body(this.rentalResponseApiMapper.toResponseApi(handBackGame));
     }
 
 }
