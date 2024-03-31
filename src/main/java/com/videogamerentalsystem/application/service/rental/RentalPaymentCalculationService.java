@@ -66,7 +66,6 @@ public class RentalPaymentCalculationService implements RentalPaymentCalculation
             BigDecimal rentalProductCharge = this.getChargeToApplyByGameType(numberDays, gameInventoryModel.getType(), gameInventoryPriceAmount);
             productModel.updateCharges(RentalProductChargeModel.builder().price(rentalProductCharge).build());
             productModel.updateNumberDays(numberDays);
-
         }
     }
 

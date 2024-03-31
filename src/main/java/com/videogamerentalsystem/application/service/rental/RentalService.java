@@ -1,6 +1,5 @@
 package com.videogamerentalsystem.application.service.rental;
 
-import com.videogamerentalsystem.application.service.inventory.GameInventoryService;
 import com.videogamerentalsystem.common.UseCase;
 import com.videogamerentalsystem.domain.model.inventory.GameInventoryModel;
 import com.videogamerentalsystem.domain.model.rental.RentalCustomerModel;
@@ -8,6 +7,9 @@ import com.videogamerentalsystem.domain.model.rental.RentalModel;
 import com.videogamerentalsystem.domain.model.rental.RentalProductChargeModel;
 import com.videogamerentalsystem.domain.model.rental.RentalProductModel;
 import com.videogamerentalsystem.domain.model.rental.constant.RentalProductStatus;
+import com.videogamerentalsystem.domain.port.in.inventory.GameInventoryUserCase;
+import com.videogamerentalsystem.domain.port.in.rental.RentalLoyaltyUserCase;
+import com.videogamerentalsystem.domain.port.in.rental.RentalPaymentCalculationUserCase;
 import com.videogamerentalsystem.domain.port.in.rental.RentalUserCase;
 import com.videogamerentalsystem.domain.port.in.rental.command.RentalCommand;
 import com.videogamerentalsystem.domain.port.in.rental.command.RentalCustomerCommand;
@@ -34,11 +36,11 @@ public class RentalService implements RentalUserCase {
 
     private final RentalRepositoryPort rentalRepositoryPort;
 
-    private final GameInventoryService gameInventoryService;
+    private final GameInventoryUserCase gameInventoryUserCase;
 
-    private final RentalPaymentCalculationService rentalPaymentCalculationService;
+    private final RentalPaymentCalculationUserCase rentalPaymentCalculationUserCase;
 
-    private final RentalLoyaltyService rentalLoyaltyService;
+    private final RentalLoyaltyUserCase rentalLoyaltyUserCase;
 
     @Override
     public RentalModel create(RentalCommand rentalCommand) {
@@ -47,17 +49,17 @@ public class RentalService implements RentalUserCase {
 
         List<RentalProductModel> productModels = buildToModel.getProductModels();
 
-        List<GameInventoryModel> gameInventoryModels = this.gameInventoryService.stockExists(this.getTitles(productModels));
+        List<GameInventoryModel> gameInventoryModels = this.gameInventoryUserCase.stockExists(this.getTitles(productModels));
 
-        this.rentalPaymentCalculationService.applyAndCalculateRentalCost(buildToModel, gameInventoryModels);
+        this.rentalPaymentCalculationUserCase.applyAndCalculateRentalCost(buildToModel, gameInventoryModels);
 
-        Integer loyaltyPoints = this.rentalLoyaltyService.calculateTotalPoints(productModels);
+        Integer loyaltyPoints = this.rentalLoyaltyUserCase.calculateTotalPoints(productModels);
 
         buildToModel.getCustomerModel().addLoyaltyPoints(loyaltyPoints);
 
         RentalModel rentalModel = this.rentalRepositoryPort.create(buildToModel);
 
-        this.gameInventoryService.stockRemove(gameInventoryModels);
+        this.gameInventoryUserCase.stockRemove(gameInventoryModels);
 
         return rentalModel;
     }
@@ -77,9 +79,9 @@ public class RentalService implements RentalUserCase {
             throw new ApiException("The product  %d finished, please check the rent: %d".formatted(rentalProductId, rentalId), HttpStatus.BAD_REQUEST);
         }
 
-        GameInventoryModel gameInventoryModel = this.gameInventoryService.findInventoryByTitle(productModel.getTitle()).orElseThrow(() -> new ApiException(ApiExceptionConstantsMessagesError.PRODUCT_TITLE_NOT_FOUND, HttpStatus.NOT_FOUND));
+        GameInventoryModel gameInventoryModel = this.gameInventoryUserCase.findInventoryByTitle(productModel.getTitle()).orElseThrow(() -> new ApiException(ApiExceptionConstantsMessagesError.PRODUCT_TITLE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        this.rentalPaymentCalculationService.applySurchargeForProduct(productModel);
+        this.rentalPaymentCalculationUserCase.applySurchargeForProduct(productModel);
 
         RentalProductChargeModel rentalProductChargeModel = productModel.getCharges();
 
@@ -87,7 +89,7 @@ public class RentalService implements RentalUserCase {
 
         productModel.updateStatus(RentalProductStatus.FINISH);
 
-        this.gameInventoryService.stockAdd(gameInventoryModel);
+        this.gameInventoryUserCase.stockAdd(gameInventoryModel);
 
         return rentalModel;
     }
