@@ -28,7 +28,7 @@ import org.springframework.util.CollectionUtils;
 @Transactional(propagation = Propagation.REQUIRED)
 public class RentalPaymentCalculationService implements RentalPaymentCalculationUserCase {
 
-    public static final String EXTRAS_DAYS = "EXTRAS_DAYS";
+    public static final String EXTRAS_DAYS = "EXTRAS_DAYS: ";
 
     @Override
     public void applyAndCalculateRentalCost(RentalModel rentalModel, List<GameInventoryModel> gameInventoryModels) {
@@ -49,10 +49,9 @@ public class RentalPaymentCalculationService implements RentalPaymentCalculation
             RentalProductChargeModel charges = productModel.getCharges();
             BigDecimal chargesPrice = charges.getPrice();
             BigDecimal total = this.getTotal(numberDays, chargesPrice);
-            BigDecimal priceWithOutPromo = this.getPriceWithOutPromo(numberDays, chargesPrice);
-            BigDecimal subTotal = priceWithOutPromo.subtract(chargesPrice);
+            BigDecimal subTotal = total.subtract(chargesPrice);
             productModel.getCharges().updateTotalAndPrice(total, chargesPrice);
-            charges.addSurchargeModel(this.buildSurcharge(subTotal));
+            charges.addSurchargeModel(this.buildSurcharge(subTotal,numberDays));
         }
     }
 
@@ -99,8 +98,8 @@ public class RentalPaymentCalculationService implements RentalPaymentCalculation
         long dayDiff = ChronoUnit.DAYS.between(date.toLocalDate(), productModel.getEndDate().toLocalDate());
         return (dayDiff == 0) ? 1 : Math.toIntExact(dayDiff);
     }
-    private RentalProductSurchargeModel buildSurcharge(BigDecimal subTotal) {
-        return RentalProductSurchargeModel.builder().amount(subTotal).reason(EXTRAS_DAYS).build();
+    private RentalProductSurchargeModel buildSurcharge(BigDecimal subTotal, Integer numberDays) {
+        return RentalProductSurchargeModel.builder().amount(subTotal).reason(EXTRAS_DAYS+numberDays).build();
     }
     private BigDecimal getTotal(Integer numberDays, BigDecimal price) {
         return (numberDays == 1) ? price.add(price) : this.getPriceWithOutPromo(numberDays, price);
