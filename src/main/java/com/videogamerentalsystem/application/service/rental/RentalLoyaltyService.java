@@ -12,19 +12,16 @@ import java.util.Map;
 
 @UseCase
 public class RentalLoyaltyService implements RentalLoyaltyUserCase {
-    private static final Map<GameType, RentalLoyalty> POINTS_PER_TYPE = new EnumMap<>(GameType.class);
-
-    static {
-        POINTS_PER_TYPE.put(GameType.NEW_RELEASE, RentalLoyalty.NEW_RELEASE_POINT);
-        POINTS_PER_TYPE.put(GameType.STANDARD, RentalLoyalty.STANDARD_POINT);
-        POINTS_PER_TYPE.put(GameType.CLASSIC, RentalLoyalty.CLASSIC_POINT);
-    }
+    private static final Map<GameType, RentalLoyalty> POINTS_PER_TYPE_CONF = Map.of(
+            GameType.NEW_RELEASE, RentalLoyalty.NEW_RELEASE_POINT,
+            GameType.STANDARD, RentalLoyalty.STANDARD_POINT,
+            GameType.CLASSIC, RentalLoyalty.CLASSIC_POINT
+    );
 
     public Integer calculateTotalPoints(List<RentalProductModel> productModels) {
         return productModels.stream()
-                .mapToInt(product -> POINTS_PER_TYPE.getOrDefault(product.getType(), RentalLoyalty.CLASSIC_POINT).getValue())
-                .sum();
+                .map(product -> POINTS_PER_TYPE_CONF.getOrDefault(product.getType(), RentalLoyalty.CLASSIC_POINT).getValue())
+                .reduce(0, Integer::sum);
     }
-
 
 }

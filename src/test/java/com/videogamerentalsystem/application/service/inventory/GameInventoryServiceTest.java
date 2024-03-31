@@ -168,7 +168,7 @@ class GameInventoryServiceTest {
 
         // When & Then
         ApiException exception = assertThrows(ApiException.class, () -> this.gameInventoryService.stockExists(titles));
-        assertEquals(ApiExceptionConstantsMessagesError.NOT_STOCK, exception.getMessage());
+        assertEquals(ApiExceptionConstantsMessagesError.GameInventory.NOT_STOCK, exception.getMessage());
         assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus());
     }
 

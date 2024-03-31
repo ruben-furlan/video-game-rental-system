@@ -95,7 +95,7 @@ class RentalServiceTest {
         // Given
         RentalCommand rentalCommand = TestRentalHelper.generateRentalDefaultCommand();
         when(this.gameInventoryUserCase.stockExists(anyList()))
-                .thenThrow(new ApiException(ApiExceptionConstantsMessagesError.NOT_STOCK, HttpStatus.BAD_REQUEST));
+                .thenThrow(new ApiException(ApiExceptionConstantsMessagesError.GameInventory.NOT_STOCK, HttpStatus.BAD_REQUEST));
 
         // When & Then
         ApiException exception = assertThrows(ApiException.class, () -> rentalService.create(rentalCommand));

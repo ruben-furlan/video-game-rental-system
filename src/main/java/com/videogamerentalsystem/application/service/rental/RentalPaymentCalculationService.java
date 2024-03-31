@@ -33,7 +33,7 @@ public class RentalPaymentCalculationService implements RentalPaymentCalculation
     @Override
     public void applyAndCalculateRentalCost(RentalModel rentalModel, List<GameInventoryModel> gameInventoryModels) {
         if (Objects.isNull(rentalModel) || CollectionUtils.isEmpty(rentalModel.getProductModels())) {
-            throw new ApiException(ApiExceptionConstantsMessagesError.MESSAGE_GENERIC, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ApiException(ApiExceptionConstantsMessagesError.Generic.MESSAGE_GENERIC, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         rentalModel.getProductModels().forEach(productModel -> this.applyCostConditions(rentalModel, gameInventoryModels, productModel));
     }
@@ -41,7 +41,7 @@ public class RentalPaymentCalculationService implements RentalPaymentCalculation
     @Override
     public void applySurchargeForProduct(RentalProductModel productModel) {
         if (Objects.isNull(productModel)) {
-            throw new ApiException(ApiExceptionConstantsMessagesError.MESSAGE_GENERIC, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ApiException(ApiExceptionConstantsMessagesError.Generic.MESSAGE_GENERIC, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         Integer numberDays = this.calculateNumberDays(productModel, LocalDateTime.now());
         if (this.isDelayed(numberDays)) {
