@@ -73,7 +73,7 @@ public class RentalPaymentCalculationServiceTest {
         // Assert
         assertEquals(BigDecimal.valueOf(8), productModel.getCharges().getTotal());
         assertNotNull(productModel.getCharges().getSurcharges());
-        assertEquals("EXTRAS_DAYS", productModel.getCharges().getSurcharges().getReason());
+        assertEquals("EXTRAS_DAYS: 1", productModel.getCharges().getSurcharges().getReason());
     }
 
     @Test
